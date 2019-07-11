@@ -6,6 +6,8 @@ EAPI=7
 CMAKE_MAKEFILE_GENERATOR="emake"
 inherit cmake-utils systemd
 
+MY_PN="openvas"
+
 DESCRIPTION="OpenVAS remote network security scanner"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/openvas-scanner/archive/v${PV}.tar.gz -> ${P}.tar.gz"
@@ -41,6 +43,9 @@ BDEPEND="
 		  dev-perl/CGI
 		  dev-perl/SQL-Translator
 	)"
+
+BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
+S="${WORKDIR}/${MY_PN}-${PV}"
 
 src_prepare() {
 	cmake-utils_src_prepare

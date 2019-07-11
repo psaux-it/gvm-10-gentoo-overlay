@@ -51,7 +51,7 @@ PATCHES=(
 	"${FILESDIR}/${P}-pid.patch"
 	# Disable yarn-fetch during compile.
 	"${FILESDIR}/${P}-yarn-install.patch"
-	# Fix react script build error.
+	# Fix react-env path.
 	"${FILESDIR}/${P}-react-env.patch"
 	# Fix build error for 8.0.0.
 	"${FILESDIR}/${P}-revision_8.0.1.patch"

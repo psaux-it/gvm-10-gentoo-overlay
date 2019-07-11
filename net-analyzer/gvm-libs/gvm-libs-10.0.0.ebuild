@@ -67,7 +67,6 @@ src_compile() {
 		HTML_DOCS=( "${BUILD_DIR}"/doc/generated/html/. )
 	fi
 	cmake-utils_src_make rebuild_cache
-	cmake-utils_src_make format
 }
 
 src_install() {

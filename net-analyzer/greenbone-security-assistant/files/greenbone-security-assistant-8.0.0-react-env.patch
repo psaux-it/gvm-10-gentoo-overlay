@@ -1,0 +1,20 @@
+--- a/gsa/package.json	2019-04-05 17:16:01.000000000 +0300
++++ b/gsa/package.json	2019-04-12 04:57:40.962420279 +0300
+@@ -66,12 +66,12 @@
+     "x2js": "^3.2.6"
+   },
+   "scripts": {
+-    "test": "NODE_PATH=src react-scripts test",
+-    "test:coverage": "NODE_PATH=src react-scripts test --coverage --maxWorkers 2",
++    "test": "NODE_PATH=src NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js test",
++    "test:coverage": "NODE_PATH=src NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js test --coverage --maxWorkers 2",
+     "lint": "NODE_PATH=src eslint --max-warnings 0 src",
+-    "start": "NODE_PATH=src react-scripts start",
+-    "build": "NODE_PATH=src react-scripts build",
+-    "eject": "NODE_PATH=src react-scripts eject"
++    "start": "NODE_PATH=src NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js start",
++    "build": "NODE_PATH=src NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js build",
++    "eject": "NODE_PATH=src NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js eject"
+   },
+   "devDependencies": {
+     "eslint-config-prettier": "^4.0.0",

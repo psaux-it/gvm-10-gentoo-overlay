@@ -1,0 +1,457 @@
+--- a/CMakeLists.txt	2019-04-12 15:45:10.212309606 +0300
++++ b/CMakeLists.txt	2019-04-12 17:25:27.362533386 +0300
+@@ -1,3 +1,4 @@
++
+ # Copyright (C) 2009-2018 Greenbone Networks GmbH
+ #
+ # SPDX-License-Identifier: GPL-2.0-or-later
+@@ -58,8 +59,6 @@
+     else (GIT_FOUND)
+       set (GIT_REVISION "~git")
+     endif (GIT_FOUND)
+-  else (EXISTS "${CMAKE_SOURCE_DIR}/.git/")
+-    set (GIT_REVISION "~git")
+   endif (EXISTS "${CMAKE_SOURCE_DIR}/.git/")
+ endif (NOT CMAKE_BUILD_TYPE MATCHES "Release")
+ 
+--- a/cmake/GetGit.cmake	2019-04-05 17:16:01.000000000 +0300
++++ b/cmake/GetGit.cmake	2019-04-12 16:48:27.691005282 +0300
+@@ -16,8 +16,7 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+-# This script attempts to determine the Git commit ID and writes or updates
+-# a "gitrevision.h" file if successful.
++# This script attempts to determine the Git commit ID
+ 
+ find_package (Git)
+ 
+@@ -33,16 +32,3 @@
+   string (REPLACE "/" "_" GIT_BRANCH ${GIT_BRANCH})
+   set (${variable} "${GIT_COMMIT_HASH}-${GIT_BRANCH}")
+ endmacro (Git_GET_REVISION)
+-
+-if (EXISTS "${SOURCE_DIR}/.git/")
+-  if (GIT_FOUND)
+-    Git_GET_REVISION (${SOURCE_DIR} GIT_REVISION)
+-  endif (GIT_FOUND)
+-endif (EXISTS "${SOURCE_DIR}/.git/")
+-
+-if (GIT_REVISION)
+-  file (WRITE gitrevision.h.in "#define GSAD_GIT_REVISION \"${GIT_REVISION}\"\n")
+-  execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different
+-                   gitrevision.h.in gitrevision.h)
+-  file (REMOVE gitrevision.h.in)
+-endif (GIT_REVISION)
+--- a/gsad/src/gsad.c	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad.c	2019-04-12 16:52:54.058709901 +0300
+@@ -88,10 +88,6 @@
+ #include <gvm/util/fileutils.h>
+ #include <microhttpd.h>
+ 
+-#ifdef GIT_REV_AVAILABLE
+-#include "gitrevision.h"
+-#endif
+-
+ #undef G_LOG_DOMAIN
+ /**
+  * @brief GLib log domain.
+@@ -167,19 +163,6 @@
+   " frame-ancestors 'self'"
+ 
+ /**
+- * @brief Default value for HTTP header "X-Frame-Options" for guest charts
+- */
+-#define DEFAULT_GSAD_GUEST_CHART_X_FRAME_OPTIONS "SAMEORIGIN"
+-
+-/**
+- * @brief Default guest charts value for HTTP header "Content-Security-Policy"
+- */
+-#define DEFAULT_GSAD_GUEST_CHART_CONTENT_SECURITY_POLICY \
+-  "default-src 'self' 'unsafe-inline';"                  \
+-  " img-src 'self' blob:;"                               \
+-  " frame-ancestors *"
+-
+-/**
+  * @brief Default "max-age" for HTTP header "Strict-Transport-Security"
+  */
+ #define DEFAULT_GSAD_HSTS_MAX_AGE 31536000
+@@ -189,6 +172,12 @@
+  */
+ #define DEFAULT_GSAD_PER_IP_CONNECTION_LIMIT 30
+ 
++#define COPYRIGHT \
++  "Copyright (C) 2010 - 2019 Greenbone Networks GmbH\n" \
++  "License GPLv2+: GNU GPL version 2 or later\n" \
++  "This is free software: you are free to change and redistribute it.\n" \
++  "There is NO WARRANTY, to the extent permitted by law.\n\n"
++
+ /**
+  * @brief Flag for signal handler.
+  */
+@@ -1328,7 +1317,6 @@
+   credentials_t *credentials = NULL;
+   gchar *res = NULL, *new_sid = NULL;
+   const gchar *cmd, *caller, *language;
+-  authentication_reason_t auth_reason;
+   gvm_connection_t connection;
+   cmd_response_data_t *response_data = cmd_response_data_new ();
+ 
+@@ -1410,18 +1398,12 @@
+                                             BAD_MISSING_COOKIE);
+     }
+ 
+-  if (ret == USER_GUEST_LOGIN_FAILED || ret == USER_GMP_DOWN
+-      || ret == USER_GUEST_LOGIN_ERROR)
++  if (ret == USER_GMP_DOWN)
+     {
+-      auth_reason =
+-        ret == USER_GMP_DOWN
+-          ? GMP_SERVICE_DOWN
+-          : (ret == USER_GUEST_LOGIN_ERROR ? LOGIN_ERROR : LOGIN_FAILED);
+-
+       cmd_response_data_free (response_data);
+ 
+       return handler_send_reauthentication (con, MHD_HTTP_SERVICE_UNAVAILABLE,
+-                                            auth_reason);
++                                            GMP_SERVICE_DOWN);
+     }
+ 
+   /* From here, the user is authenticated. */
+@@ -2163,12 +2145,6 @@
+ 
+   response = MHD_create_response_from_buffer (res_len, (void *) res,
+                                               MHD_RESPMEM_MUST_FREE);
+-  if (get_guest_password ()
+-      && str_equal (user_get_username (user), get_guest_username ()) && cmd
+-      && str_equal (cmd, "get_aggregate"))
+-    {
+-      add_guest_chart_content_security_headers (response);
+-    }
+ 
+   if (watcher_data)
+     {
+@@ -2762,21 +2738,14 @@
+   static gchar *gsad_redirect_port_string = NULL;
+   static gchar *gsad_manager_port_string = NULL;
+   static gchar *gsad_vendor_version_string = NULL;
+-  static gchar *gsad_login_label_name = NULL;
+   static gchar *ssl_private_key_filename = GVM_SERVER_KEY;
+   static gchar *ssl_certificate_filename = GVM_SERVER_CERTIFICATE;
+   static gchar *dh_params_filename = NULL;
+   static gchar *unix_socket_path = NULL;
+   static gchar *gnutls_priorities = "NORMAL";
+   static int debug_tls = 0;
+-  static gchar *guest_user = NULL;
+-  static gchar *guest_pass = NULL;
+   static gchar *http_frame_opts = DEFAULT_GSAD_X_FRAME_OPTIONS;
+   static gchar *http_csp = DEFAULT_GSAD_CONTENT_SECURITY_POLICY;
+-  static gchar *http_guest_chart_frame_opts =
+-    DEFAULT_GSAD_GUEST_CHART_X_FRAME_OPTIONS;
+-  static gchar *http_guest_chart_csp =
+-    DEFAULT_GSAD_GUEST_CHART_CONTENT_SECURITY_POLICY;
+   static int hsts_enabled = FALSE;
+   static int hsts_max_age = DEFAULT_GSAD_HSTS_MAX_AGE;
+   static gchar *http_cors = "";
+@@ -2812,8 +2781,6 @@
+     {"vendor-version", '\0', 0, G_OPTION_ARG_STRING,
+      &gsad_vendor_version_string, "Use <string> as version in interface.",
+      "<string>"},
+-    {"login-label", '\0', 0, G_OPTION_ARG_STRING, &gsad_login_label_name,
+-     "Use <string> as login label.", "<string>"},
+     {"ssl-private-key", 'k', 0, G_OPTION_ARG_FILENAME,
+      &ssl_private_key_filename, "Use <file> as the private key for HTTPS",
+      "<file>"},
+@@ -2838,10 +2805,6 @@
+      "Enable TLS debugging at <level>", "<level>"},
+     {"gnutls-priorities", '\0', 0, G_OPTION_ARG_STRING, &gnutls_priorities,
+      "GnuTLS priorities string.", "<string>"},
+-    {"guest-username", 0, 0, G_OPTION_ARG_STRING, &guest_user,
+-     "Username for guest user.  Enables guest logins.", "<name>"},
+-    {"guest-password", 0, 0, G_OPTION_ARG_STRING, &guest_pass,
+-     "Password for guest user.  Defaults to guest username.", "<password>"},
+     {"http-frame-opts", 0, 0, G_OPTION_ARG_STRING, &http_frame_opts,
+      "X-Frame-Options HTTP header.  Defaults to \"" DEFAULT_GSAD_X_FRAME_OPTIONS
+      "\".",
+@@ -2850,15 +2813,6 @@
+      "Content-Security-Policy HTTP header.  Defaults to "
+      "\"" DEFAULT_GSAD_CONTENT_SECURITY_POLICY "\".",
+      "<csp>"},
+-    {"http-guest-chart-frame-opts", 0, 0, G_OPTION_ARG_STRING,
+-     &http_guest_chart_frame_opts,
+-     "X-Frame-Options HTTP header for guest charts.  Defaults to "
+-     "\"" DEFAULT_GSAD_GUEST_CHART_X_FRAME_OPTIONS "\".",
+-     "<frame-opts>"},
+-    {"http-guest-chart-csp", 0, 0, G_OPTION_ARG_STRING, &http_guest_chart_csp,
+-     "Content-Security-Policy HTTP header.  Defaults to "
+-     "\"" DEFAULT_GSAD_GUEST_CHART_CONTENT_SECURITY_POLICY "\".",
+-     "<csp>"},
+     {"http-sts", 0, 0, G_OPTION_ARG_NONE, &hsts_enabled,
+      "Enable HTTP Strict-Tranport-Security header.", NULL},
+     {"http-sts-max-age", 0, 0, G_OPTION_ARG_INT, &hsts_max_age,
+@@ -2892,8 +2846,6 @@
+ 
+   set_http_x_frame_options (http_frame_opts);
+   set_http_content_security_policy (http_csp);
+-  set_http_guest_chart_x_frame_options (http_guest_chart_frame_opts);
+-  set_http_guest_chart_content_security_policy (http_guest_chart_csp);
+   set_http_cors_origin (http_cors);
+ 
+   set_http_only (!!http_only);
+@@ -2923,19 +2875,12 @@
+   if (print_version)
+     {
+       printf ("Greenbone Security Assistant %s\n", GSAD_VERSION);
+-#ifdef GSAD_GIT_REVISION
+-      printf ("GIT revision %s\n", GSAD_GIT_REVISION);
+-#endif
+       if (debug_tls)
+         {
+           printf ("gnutls %s\n", gnutls_check_version (NULL));
+           printf ("libmicrohttpd %s\n", MHD_get_version ());
+         }
+-      printf ("Copyright (C) 2010-2016 Greenbone Networks GmbH\n");
+-      printf ("License GPLv2+: GNU GPL version 2 or later\n");
+-      printf (
+-        "This is free software: you are free to change and redistribute it.\n"
+-        "There is NO WARRANTY, to the extent permitted by law.\n\n");
++      printf (COPYRIGHT);
+       exit (EXIT_SUCCESS);
+     }
+ 
+@@ -2956,15 +2901,6 @@
+   if (gsad_vendor_version_string)
+     vendor_version_set (gsad_vendor_version_string);
+ 
+-  if (gsad_login_label_name)
+-    {
+-      if (label_name_set (gsad_login_label_name))
+-        {
+-          g_critical ("Invalid character in login label name\n");
+-          exit (EXIT_FAILURE);
+-        }
+-    }
+-
+   if (no_redirect && gsad_redirect_port_string)
+     {
+       g_warning ("--no-redirect option given with --rport");
+@@ -3000,12 +2936,7 @@
+       }
+   }
+ 
+-#ifdef GSAD_GIT_REVISION
+-  g_message ("Starting GSAD version %s (GIT revision %s)\n", GSAD_VERSION,
+-             GSAD_GIT_REVISION);
+-#else
+   g_message ("Starting GSAD version %s\n", GSAD_VERSION);
+-#endif
+ 
+   /* Finish processing the command line options. */
+ 
+@@ -3025,12 +2956,6 @@
+       client_watch_interval = 0;
+     }
+ 
+-  if (guest_user)
+-    {
+-      set_guest_username (guest_user);
+-      set_guest_password (guest_pass ? guest_pass : guest_user);
+-    }
+-
+   gsad_port = http_only ? DEFAULT_GSAD_HTTP_PORT : DEFAULT_GSAD_HTTPS_PORT;
+ 
+   if (gsad_port_string)
+--- a/gsad/src/gsad_gmp.c	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad_gmp.c	2019-04-12 17:40:16.621541834 +0300
+@@ -473,14 +473,19 @@
+     "<role>%s</role>"
+     "<severity>%s</severity>"
+     "<i18n>%s</i18n>"
+-    "<guest>%d</guest>"
+     "<client_address>%s</client_address>"
+     "<backend_operation>%.2f</backend_operation>",
+-    GSAD_VERSION, vendor_version_get (), user_get_token (user), ctime_now,
+-    timezone ? timezone : "", user_get_username (user),
+-    user_get_session_timeout (user), user_get_role (user),
+-    user_get_severity (user), credentials_get_language (credentials),
+-    user_get_guest (user), user_get_client_address (user),
++    GSAD_VERSION,
++    vendor_version_get (),
++    user_get_token (user),
++    ctime_now,
++    timezone ? timezone : "",
++    user_get_username (user),
++    user_get_session_timeout (user),
++    user_get_role (user),
++    user_get_severity (user),
++    credentials_get_language (credentials),
++    user_get_client_address (user),
+     credentials_get_cmd_duration (credentials));
+ 
+   g_string_append (string, res);
+--- a/gsad/src/gsad_http_handler.c	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad_http_handler.c	2019-04-12 17:07:49.146716517 +0300
+@@ -410,16 +410,11 @@
+ 
+   ret = get_user_from_connection (connection, &user);
+ 
+-  if (ret == USER_GUEST_LOGIN_FAILED || ret == USER_GMP_DOWN
+-      || ret == USER_GUEST_LOGIN_ERROR)
++  if (ret == USER_GMP_DOWN)
+     {
+-      auth_reason =
+-        ret == USER_GMP_DOWN
+-          ? GMP_SERVICE_DOWN
+-          : (ret == USER_GUEST_LOGIN_ERROR ? LOGIN_ERROR : LOGIN_FAILED);
+ 
+       return handler_send_reauthentication (
+-        connection, MHD_HTTP_SERVICE_UNAVAILABLE, auth_reason);
++        connection, MHD_HTTP_SERVICE_UNAVAILABLE, GMP_SERVICE_DOWN);
+     }
+ 
+   if ((ret == USER_EXPIRED_TOKEN) || (ret == USER_BAD_MISSING_COOKIE)
+--- a/gsad/src/gsad_settings.c	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad_settings.c	2019-04-12 17:10:38.718527972 +0300
+@@ -29,8 +29,6 @@
+  */
+ gchar *vendor_version = NULL;
+ 
+-gchar *label_name = NULL;
+-
+ /**
+  * @brief Guest username.
+  */
+@@ -121,24 +119,6 @@
+   return vendor_version ? vendor_version : "";
+ }
+ 
+-/**
+- * @brief Set the login label.
+- *
+- * @param[in]  name  New login label name.
+- *
+- * @return 0 on success -1 if name contains invalid characters
+- */
+-int
+-label_name_set (const gchar *name)
+-{
+-  if (!g_regex_match_simple ("^[a-zA-Z0-9\\-_\\.\\:]+$", name, 0, 0))
+-    return -1;
+-
+-  g_free (label_name);
+-  label_name = g_strdup (name);
+-  return 0;
+-}
+-
+ void
+ set_guest_username (const gchar *username)
+ {
+--- a/gsad/src/gsad_user.c	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad_user.c	2019-04-12 17:15:26.417207120 +0300
+@@ -53,7 +53,6 @@
+   gchar *pw_warning;   ///< Password policy warning.
+   gchar *address;      ///< Client's IP address.
+   time_t time;         ///< Login time.
+-  gboolean guest;      ///< Whether the user is a guest.
+ };
+ 
+ void
+@@ -74,7 +73,7 @@
+                     const gchar *timezone, const gchar *severity,
+                     const gchar *role, const gchar *capabilities,
+                     const gchar *language, const gchar *pw_warning,
+-                    const gchar *address, const gboolean guest)
++                    const gchar *address)
+ {
+   user_t *user = user_new ();
+ 
+@@ -90,7 +89,6 @@
+   user->language = g_strdup (language);
+   user->pw_warning = g_strdup (pw_warning);
+   user->address = g_strdup (address);
+-  user->guest = guest;
+ 
+   user_set_language (user, language);
+   user_renew_session (user);
+@@ -142,7 +140,6 @@
+   copy->pw_warning = g_strdup (user->pw_warning);
+   copy->address = g_strdup (user->address);
+   copy->time = user->time;
+-  copy->guest = user->guest;
+ 
+   return copy;
+ }
+@@ -219,12 +216,6 @@
+   return user->password;
+ }
+ 
+-gboolean
+-user_get_guest (user_t *user)
+-{
+-  return user->guest;
+-}
+-
+ const time_t
+ user_get_session_timeout (user_t *user)
+ {
+@@ -360,8 +351,6 @@
+           const gchar *severity, const gchar *role, const gchar *capabilities,
+           const gchar *language, const gchar *pw_warning, const char *address)
+ {
+-  const gchar *guest_username = get_guest_username ();
+-
+   user_t *user = session_get_user_by_username (username);
+ 
+   if (user && user_session_expired (user))
+@@ -370,16 +359,9 @@
+       user_free (user);
+     }
+ 
+-  gboolean guest = 0;
+-
+-  if (guest_username)
+-    {
+-      guest = str_equal (username, guest_username) ? 1 : 0;
+-    }
+-
+   user =
+     user_new_with_data (username, password, timezone, severity, role,
+-                        capabilities, language, pw_warning, address, guest);
++                        capabilities, language, pw_warning, address);
+ 
+   session_add_user (user->token, user);
+ 
+@@ -402,10 +384,7 @@
+  *         2 expired token,
+  *         3 bad/missing cookie,
+  *         4 bad/missing token,
+- *         5 guest login failed,
+- *         6 GMP down for guest login,
+  *         7 IP address mismatch,
+- *        -1 error during guest login.
+  */
+ int
+ user_find (const gchar *cookie, const gchar *token, const char *address,
+--- a/gsad/src/gsad_user.h	2019-04-05 17:16:01.000000000 +0300
++++ b/gsad/src/gsad_user.h	2019-04-12 17:19:22.994942447 +0300
+@@ -34,10 +34,8 @@
+ #define USER_EXPIRED_TOKEN 2
+ #define USER_BAD_MISSING_COOKIE 3
+ #define USER_BAD_MISSING_TOKEN 4
+-#define USER_GUEST_LOGIN_FAILED 5
+ #define USER_GMP_DOWN 6
+ #define USER_IP_ADDRESS_MISSMATCH 7
+-#define USER_GUEST_LOGIN_ERROR -1
+ 
+ /**
+  * @brief User information type, for sessions.
+@@ -92,9 +90,6 @@
+ const gchar *
+ user_get_timezone (user_t *user);
+ 
+-gboolean
+-user_get_guest (user_t *user);
+-
+ const gchar *
+ user_get_client_address (user_t *user);
+ 

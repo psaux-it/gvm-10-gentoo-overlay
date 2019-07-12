@@ -47,6 +47,11 @@ BDEPEND="
 BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
 S="${WORKDIR}/${MY_PN}-${PV}"
 
+PATCHES=(
+	"${FILESDIR}/${P}-execinfo-musl-fix.patch"
+	"${FILESDIR}/${P}-malloc-trim.patch"
+)
+
 src_prepare() {
 	cmake-utils_src_prepare
 	# Fix for correct FHS/Gentoo policy paths for 6.0.0

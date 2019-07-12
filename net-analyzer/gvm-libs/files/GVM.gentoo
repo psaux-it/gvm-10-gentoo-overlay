@@ -3,13 +3,29 @@
 -----------------------------------------------------------------
 You will need to set up your /etc/redis.conf file properly before
 running openvas-scanner for the first time.
+
+Modify /etc/redis.conf by setting :
+Other than /tmp/redis.sock causes problems !
+
+----------------------------
+unixsocket /tmp/redis.sock |
+unixsocketperm 700         |
+port 0                     |
+#save 900 1                |
+#save 300 10               |
+#save 60 10000             |
+----------------------------
+
 For details, please see the example config file installed to:
 --> /etc/openvas/redis.conf.example
+
 Please configure /etc/openvas/openvassd.conf properly
 according to redis listening unix socket.
-e.g. /etc/openvas/openvassd.conf --> kb_location = /tmp/redis.sock
+e.g. /etc/openvas/openvassd.conf --> db_address = /tmp/redis.sock
+
 If you use first-start script it will check various issues and
-automatically setup OpenVAS for first time use.
+automatically setup GVM for first time use.
+
 GSA(Greenbone Security Agent) WebUI listens port
 9392(local) default. If you want to use nginx reverse proxy
 to reach WebUI please see the example config file
@@ -20,7 +36,7 @@ otherwise you can change port to 443 or 80.
 ---------------------------SCRIPTS-------------------------------
 -----------------------------------------------------------------
 'first-start'                  
---> Automatically setup OpenVAS for first time use
+--> Automatically setup GVM for first time use
 --> Installed in /etc/openvas/scripts
 
 'openvas-feed-sync'
@@ -35,23 +51,25 @@ otherwise you can change port to 443 or 80.
 --> Installed in /etc/openvas/sysconfig
 
 'gvmd-daemon.conf'
---> OpenVAS Manager systemd daemon settings
---> Installed in /etc/openvas/sysconfig
+--> Greenbone Vulnerability Manager systemd daemon settings
+--> Installed in /etc/gvm/sysconfig
 
 'gsa-daemon.conf
---> Greenbone Security Agent systemd daemon settings
---> Installed in /etc/openvas/sysconfig
+--> Greenbone Security Assistant systemd daemon settings
+--> Installed in /etc/gvm/sysconfig
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 'openvas-scanner'
 --> OpenVAS Scanner open-rc daemon settings
 --> Installed in /etc/config.d
 
 'gvmd'
---> OpenVAS Manager open-rc daemon settings
+--> Greenbone Vulnerability Manager open-rc daemon settings
 --> Installed in /etc/config.d
 
 'gsa'
---> Greenbone Security Agent systemd daemon settings
+--> Greenbone Security Assistant open-rc daemon settings
 --> Installed in /etc/config.d
 
 -----------------------------------------------------------------
@@ -60,7 +78,7 @@ otherwise you can change port to 443 or 80.
 'env-update && source /etc/profile'
 --> Update PATHS
 
-'openvas-manage-certs -a'
+'gvm-manage-certs -a'
 --> Create certificates automatically first time
 
 'greenbone-nvt-sync'
@@ -76,19 +94,16 @@ otherwise you can change port to 443 or 80.
 --> Generate initial NVT cache and quit
 
 'rc-service openvas-scanner start or systemctl start openvas-scanner' 
---> Start OpenVAS-Scanner
+--> Start OpenVAS-Scanner daemon
 
-'openvasmd --rebuild --progress'
---> Initialize the Database
-
-'openvasmd --create-user=admin --role=Admin'
+'gvmd --create-user=admin --role=Admin'
 --> Create User for WEBUI.Save your password
 
 'rc-service gvmd start or systemctl start gvmd'
---> Start OpenVAS-Manager
+--> Start Greenbone Vulnerability Manager daemon
 
 'rc-service gsa start or systemctl start gsa'
---> Start the Greenbone Security Assistant
+--> Start Greenbone Security Assistant daemon
 
 -----------------------------------------------------------------
 ---------------------PLUGIN KEY AND SIGNING----------------------
@@ -102,5 +117,6 @@ otherwise you can change port to 443 or 80.
 'gpg --homedir=/etc/openvas/gnupg --import GBCommunitySigningKey.asc' 
 --> Import OpenVAS Transfer Key
 
-'gpg --homedir=/etc/openvas/gnupg --lsign-key 0ED1E580'
+'gpg --homedir=/etc/openvas/gnupg --lsign-key KEY_ID' 
+'e.g --> "gpg --homedir=/etc/openvas/gnupg --lsign-key 0ED1E580"'
 --> Sign

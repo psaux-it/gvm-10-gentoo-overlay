@@ -5,7 +5,10 @@ You will need to set up your /etc/redis.conf file properly before
 running openvas-scanner for the first time.
 
 Modify /etc/redis.conf by setting :
-Other than /tmp/redis.sock causes problems !
+
+*Other than /tmp/redis.sock causes problems !
+*Comment out all "save" parts
+*Disable redis "maxmemory" option
 
 ----------------------------
 unixsocket /tmp/redis.sock |
@@ -14,6 +17,7 @@ port 0                     |
 #save 900 1                |
 #save 300 10               |
 #save 60 10000             |
+#maxmemory 64mb            |
 ----------------------------
 
 For details, please see the example config file installed to:

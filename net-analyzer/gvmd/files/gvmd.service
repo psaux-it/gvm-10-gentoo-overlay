@@ -8,7 +8,7 @@ Before=gsa.service
 [Service]
 Type=forking
 EnvironmentFile=-/etc/gvm/sysconfig/gvmd-daemon.conf
-ExecStart=/usr/sbin/openvasmd $OPENVAS_MANAGER_OPTIONS $OPENVAS_MANAGER_PORT $OPENVAS_MANAGER_LISTEN_ADDRESS $OPENVAS_MANAGER_SCANNER_HOST $OPENVAS_MANAGER_GNUTLS_PRIORITIES 
+ExecStart=/usr/sbin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES 
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=mixed
 User=root

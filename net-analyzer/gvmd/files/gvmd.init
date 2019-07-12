@@ -2,10 +2,10 @@
 # Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-name="OpenVAS Manager"
-command=/usr/sbin/openvasmd
-command_args="${OPENVAS_MANAGER_OPTIONS} ${OPENVAS_MANAGER_PORT} ${OPENVAS_MANAGER_LISTEN_ADDRESS} ${OPENVAS_MANAGER_SCANNER_HOST} ${OPENVAS_MANAGER_GNUTLS_PRIORITIES}"
-pidfile="/var/run/openvasmd.pid"
+name="Greenbone Vulnerability Manager"
+command=/usr/sbin/gvmd
+command_args="${GVMD_OPTIONS} ${GVMD_PORT} ${GVMD_LISTEN_ADDRESS} ${GVMD_SCANNER_HOST} ${GVMD_GNUTLS_PRIORITIES}"
+pidfile="/var/run/gvmd.pid"
 command_background="true"
 
 depend() {

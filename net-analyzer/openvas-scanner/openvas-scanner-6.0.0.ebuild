@@ -86,6 +86,9 @@ src_compile() {
 src_install() {
 	cmake-utils_src_install
 
+	insinto /etc/openvas
+	doins "${FILESDIR}"/openvassd.conf "${FILESDIR}"/redis.conf.example
+
 	insinto /etc/openvas/sysconfig
 	doins "${FILESDIR}"/${PN}-daemon.conf
 

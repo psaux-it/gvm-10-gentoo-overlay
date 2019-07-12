@@ -41,6 +41,10 @@ BDEPEND="
 		  dev-perl/SQL-Translator
 	)"
 
+PATCHES=(
+	"${FILESDIR}/${P}-malloc-trim.patch"
+)
+
 src_prepare() {
 	cmake-utils_src_prepare
 	if use extras; then

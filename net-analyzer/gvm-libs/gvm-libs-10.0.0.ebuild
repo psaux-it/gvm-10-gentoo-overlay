@@ -77,7 +77,7 @@ src_install() {
 	cmake-utils_src_install
 
 	insinto /usr/share/gvm
-	doins "${FILESDIR}"/OPENVAS.gentoo
+	doins "${FILESDIR}"/GVM.gentoo
 
 	keepdir /var/lib/gvm/gnupg
 	keepdir /var/log/gvm

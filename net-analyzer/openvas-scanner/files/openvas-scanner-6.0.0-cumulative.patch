@@ -1,0 +1,244 @@
+--- a/src/attack.c	2019-04-05 12:11:38.000000000 +0300
++++ b/src/attack.c	2019-07-12 01:02:50.095331697 +0300
+@@ -258,6 +258,14 @@
+   addr6_to_str (ip, ip_str);
+   oid = plugin->oid;
+   nvti = nvticache_get_nvt (oid);
++
++  /* eg. When NVT was moved/removed by a feed update during the scan. */
++  if (!nvti)
++    {
++      g_message ("Plugin '%s' missing from nvticache.", oid);
++      plugin->running_state = PLUGIN_STATUS_DONE;
++      goto finish_launch_plugin;
++    }
+   if (scan_is_stopped () || all_scans_are_stopped ())
+     {
+       if (nvti->category != ACT_END)
+--- a/src/pluginscheduler.c	2019-04-05 12:11:38.000000000 +0300
++++ b/src/pluginscheduler.c	2019-07-12 01:08:16.359138753 +0300
+@@ -75,7 +75,7 @@
+         {
+           char *name = nvticache_get_filename (oid);
+           g_message ("Plugin %s is deprecated. "
+-                     "It will neither loaded nor launched.",
++                     "It will neither be loaded nor launched.",
+                      name);
+           g_free (name);
+         }
+--- a/nasl/nasl_cmd_exec.c	2019-04-05 12:11:38.000000000 +0300
++++ b/nasl/nasl_cmd_exec.c	2019-07-12 01:12:21.054070607 +0300
+@@ -49,24 +49,45 @@
+ static pid_t pid = 0;
+ 
+ static char *
+-pread_streams (int fdin, int fderr)
++pread_streams (int fdout, int fderr)
+ {
+-  char buf[8192];
+   GString *str;
+ 
+   str = g_string_new ("");
+   errno = 0;
+-  bzero (buf, sizeof (buf));
+-  while ((read (fdin, buf, sizeof (buf))) > 0
+-         || read (fderr, buf, sizeof (buf)) > 0 || errno == EINTR)
++  for (;;)
+     {
+-      if (errno == EINTR)
++      fd_set fds;
++      char buf[8192];
++      int ret, ret_out = 0, ret_err = 0;
++      int maxfd = fdout > fderr ? fdout : fderr;
++
++      FD_ZERO (&fds);
++      FD_SET (fdout, &fds);
++      FD_SET (fderr, &fds);
++
++      ret = select (maxfd + 1, &fds, NULL, NULL, NULL);
++      if (ret == -1)
+         {
+-          errno = 0;
+-          continue;
++          if (errno == EINTR)
++            continue;
++          return NULL;
+         }
+-      g_string_append (str, buf);
+       bzero (buf, sizeof (buf));
++      if (FD_ISSET (fdout, &fds))
++        {
++          ret_out = read (fdout, buf, sizeof (buf));
++          if (ret_out > 0)
++            g_string_append (str, buf);
++        }
++      if (FD_ISSET (fderr, &fds))
++        {
++          ret_err = read (fderr, buf, sizeof (buf));
++          if (ret_err > 0)
++            g_string_append (str, buf);
++        }
++      if (ret_out <= 0 && ret_err <= 0)
++        break;
+     }
+ 
+   return g_string_free (str, FALSE);
+@@ -79,9 +100,10 @@
+   tree_cell *retc = NULL, *a;
+   anon_nasl_var *v;
+   nasl_array *av;
+-  int i, j, n, cd, fdin = 0, fderr = 0;
++  int i, j, n, cd, fdout = 0, fderr = 0;
+   char **args = NULL, *cmd, *str;
+   char cwd[MAXPATHLEN], newdir[MAXPATHLEN], key[128];
++  GError *error = NULL;
+ 
+   if (pid != 0)
+     {
+@@ -115,7 +137,7 @@
+     {
+       char *p;
+ 
+-      bzero (newdir, sizeof (newdir));
++      memset (newdir, '\0', sizeof (newdir));
+       if (cmd[0] == '/')
+         strncpy (newdir, cmd, sizeof (newdir) - 1);
+       else
+@@ -164,13 +186,20 @@
+   args[j] = NULL;
+ 
+   if (g_spawn_async_with_pipes (NULL, args, NULL, G_SPAWN_SEARCH_PATH, NULL,
+-                                NULL, &pid, NULL, &fdin, &fderr, NULL)
++                                NULL, &pid, NULL, &fdout, &fderr, &error)
+       == FALSE)
+-    goto finish_pread;
++    {
++      if (error)
++        {
++          g_warning ("%s: %s", __FUNCTION__, error->message);
++          g_error_free (error);
++        }
++      goto finish_pread;
++    }
+ 
+   snprintf (key, sizeof (key), "internal/child/%d", getpid ());
+   kb_item_set_int (lexic->script_infos->key, key, pid);
+-  str = pread_streams (fdin, fderr);
++  str = pread_streams (fdout, fderr);
+   if (str)
+     {
+       retc = alloc_typed_cell (CONST_DATA);
+@@ -179,7 +208,8 @@
+     }
+   else if (errno && errno != EINTR)
+     nasl_perror (lexic, "nasl_pread: fread(): %s\n", strerror (errno));
+-  close (fdin);
++  close (fdout);
++  close (fderr);
+   if (*cwd != '\0')
+     if (chdir (cwd) < 0)
+       nasl_perror (lexic, "pread(): chdir(%s): %s\n", cwd, strerror (errno));
+--- a/src/hosts.c	2019-04-05 12:11:38.000000000 +0300
++++ b/src/hosts.c	2019-07-12 01:20:33.723690591 +0300
+@@ -150,7 +150,8 @@
+ 
+   while (forward (h, g_soc) > 0)
+     ;
+-  ntp_timestamp_host_scan_ends (g_soc, h->host_kb, h->ip);
++  if (!global_scan_stop)
++    ntp_timestamp_host_scan_ends (g_soc, h->host_kb, h->ip);
+   if (h->next != NULL)
+     h->next->prev = h->prev;
+ 
+@@ -282,20 +283,6 @@
+   if (h == NULL)
+     return;
+ 
+-  while (h != NULL)
+-    {
+-      if (kill (h->pid, 0) < 0) /* Process is dead */
+-        {
+-          if (!h->prev)
+-            hosts = hosts->next;
+-          host_rm (h);
+-          h = hosts;
+-          if (!h)
+-            break;
+-        }
+-      h = h->next;
+-    }
+-  h = hosts;
+   while (h)
+     {
+       if (!h->ip)
+@@ -306,7 +293,18 @@
+             ntp_timestamp_host_scan_starts (g_soc, h->host_kb, h->ip);
+         }
+       if (h->ip)
+-        forward (h, g_soc);
++        {
++          forward (h, g_soc);
++          if (kill (h->pid, 0) < 0) /* Process is dead */
++            {
++              if (!h->prev)
++                hosts = hosts->next;
++              host_rm (h);
++              h = hosts;
++              if (!h)
++                break;
++            }
++        }
+       h = h->next;
+     }
+ }
+--- a/src/pluginlaunch.c	2019-04-05 12:11:38.000000000 +0300
++++ b/src/pluginlaunch.c	2019-07-12 15:38:41.642164744 +0300
+@@ -339,6 +339,26 @@
+     }
+ }
+ 
++static int
++plugin_timeout (nvti_t *nvti)
++{
++  int timeout;
++
++  assert (nvti);
++  timeout = prefs_nvt_timeout (nvti->oid);
++  if (timeout == 0)
++    timeout = nvti_timeout (nvti);
++  if (timeout == 0)
++    {
++      if (nvti_category (nvti) == ACT_SCANNER)
++        timeout = atoi (prefs_get ("scanner_plugins_timeout"))
++                   ?: SCANNER_NVT_TIMEOUT;
++      else
++        timeout = atoi (prefs_get ("plugins_timeout")) ?: NVT_TIMEOUT;
++    }
++  return timeout;
++}
++
+ /**
+  * @return PID of process that is connected to the plugin as returned by plugin
+  *         classes pl_launch function (<=0 means there was a problem).
+@@ -355,19 +375,7 @@
+   if (p < 0)
+     return -1;
+   processes[p].plugin = plugin;
+-  processes[p].timeout = prefs_nvt_timeout (plugin->oid);
+-  if (processes[p].timeout == 0)
+-    processes[p].timeout = nvti_timeout (nvti);
+-
+-  if (processes[p].timeout == 0)
+-    {
+-      if (nvti_category (nvti) == ACT_SCANNER)
+-        processes[p].timeout =
+-          atoi (prefs_get ("scanner_plugins_timeout") ?: "-1");
+-      else
+-        processes[p].timeout = atoi (prefs_get ("plugins_timeout") ?: "-1");
+-    }
+-
++  processes[p].timeout = plugin_timeout (nvti);
+   gettimeofday (&(processes[p].start), NULL);
+   processes[p].pid = nasl_plugin_launch (globals, ip, vhosts, kb, plugin->oid);
+ 
+

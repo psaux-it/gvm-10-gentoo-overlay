@@ -1,6 +1,6 @@
---- a/src/pluginscheduler.c
-+++ b/src/pluginscheduler.c
-@@ -305,7 +305,9 @@ plugins_scheduler_init (const char *plugins_list, int autoload,
+--- a/src/pluginscheduler.c	2019-07-12 15:52:15.551919519 +0300
++++ b/src/pluginscheduler.c	2019-07-12 15:58:47.487276103 +0300
+@@ -305,7 +305,9 @@
        plugins_scheduler_free (ret);
        return NULL;
      }
@@ -10,7 +10,7 @@
    return ret;
  }
  
-@@ -407,7 +409,9 @@ scheduler_phase_cleanup (plugins_scheduler_t sched, int start, int end)
+@@ -407,7 +409,9 @@
            element = element->next;
          }
      }

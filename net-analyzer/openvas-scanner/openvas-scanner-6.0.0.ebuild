@@ -15,7 +15,7 @@ SRC_URI="https://github.com/greenbone/openvas-scanner/archive/v${PV}.tar.gz -> $
 SLOT="0"
 LICENSE="GPL-2 GPL-2+"
 KEYWORDS="~amd64 ~x86"
-IUSE="extras"
+IUSE="cron extras"
 
 DEPEND="
 	app-crypt/gpgme:=
@@ -91,6 +91,13 @@ src_install() {
 
 	insinto /etc/openvas/sysconfig
 	doins "${FILESDIR}"/${PN}-daemon.conf
+
+	if use cron; then
+		# Install the cron job if they want it.
+		exeinto /etc/cron.daily
+		newexe "${FILESDIR}/gvm-feed-sync.cron" \
+		gvm-feed-sync
+	fi
 
 	insinto /etc/openvas/scripts
 	doins "${FILESDIR}"/openvas-feed-sync "${FILESDIR}"/first-start

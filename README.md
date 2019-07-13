@@ -88,18 +88,19 @@ Then run:
 
 ## Use Flags
 
-     IUSE="extras cli gsa ospd ldap radius"
+     IUSE="cli cron extras gsa ldap ospd radius"
 
- - extras     --> Required for docs, pdf results and fonts | Recommended
  - cli        --> Command Line Interfaces for OpenVAS-Scanner
- - gsa        --> Greenbone Security Agent (WebUI)
+ - cron       --> Install a cron job to update GVM's feed daily
+ - extras     --> Required for docs, pdf results and fonts | Recommended
+ - gsa        --> Greenbone Security Assistant (WebUI)
+ - ldap       --> LDAP Support for Greenbone Vulnerability Management
  - ospd       --> Scanner wrappers which share the same communication protocol
- - ldap       --> LDAP Support for Openvas-Libraries
- - radius     --> Radius Support for OpenVAS-Libraries
+ - radius     --> Radius Support for Greenbone Vulnerability Management
 
 ## Scripts
 
     Inspect the scripts. You never blindly run scripts you
     downloaded from the Internet, do you?
     
-https://github.com/hsntgm/openvas-9-scripts
+https://github.com/hsntgm/gvm-10-scripts

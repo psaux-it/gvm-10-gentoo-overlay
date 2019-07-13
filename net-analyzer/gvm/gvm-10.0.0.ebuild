@@ -11,12 +11,12 @@ HOMEPAGE="https://www.greenbone.net/en/"
 SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="~amd64 ~x86"
-IUSE="cli +extras +gsa ldap +ospd radius"
+IUSE="cli +cron +extras +gsa ldap +ospd radius"
 
 RDEPEND="
 	>=net-analyzer/gvm-libs-10.0.0[extras?,ldap?,radius?]
 	>=net-analyzer/gvmd-8.0.0[extras?]
-	>=net-analyzer/openvas-scanner-6.0.0[extras?]
+	>=net-analyzer/openvas-scanner-6.0.0[cron?,extras?]
 	cli? ( >=net-analyzer/gvm-tools-1.4.1 )
 	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.0[extras?] )
 	ospd? ( >=net-analyzer/ospd-1.3.2[extras?] )"

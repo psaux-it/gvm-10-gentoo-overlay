@@ -48,10 +48,11 @@ BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
 S="${WORKDIR}/${MY_PN}-${PV}"
 
 PATCHES=(
+	# Musl fix.
 	"${FILESDIR}/${P}-execinfo-musl-fix.patch"
-	#Revision 6.0.1 cumulative patch.
+	# Revision 6.0.1 --> #296 #301 #308 #312 #321 #330
 	"${FILESDIR}/${P}-cumulative.patch"
-	#GLIBC malloc-trim patch.
+	# GLIBC malloc-trim patch.
 	"${FILESDIR}/${P}-malloc-trim.patch"
 )
 

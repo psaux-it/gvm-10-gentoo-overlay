@@ -1,32 +1,32 @@
 #!/bin/bash
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# This is OpenVAS first-start/check-setup script which make things automatically for first time use.
+# This is GVM (previously named OpenVAS) first-start/check-setup script which make things automatically for first time use.
 
 
 ##################################################################################################
-# If you use systemd or init.d(open-rc) for OpenVAS daemons you don't need to set below settings.#
+# If you use systemd or open-rc you don't need to set below settings.                            #
 # If you don't use any of them you can set the below command args to start daemons manually.     #
 ##################################################################################################
 
-# OpenVAS Manager command args
-OPENVAS_MANAGER_OPTIONS=""                                                # e.g --foreground
-OPENVAS_MANAGER_PORT="--port=9390"                                        # Manager listen port
-OPENVAS_MANAGER_LISTEN_ADDRESS="--listen=127.0.0.1"                       # Manager listen address
-OPENVAS_MANAGER_SCANNER_HOST="--scanner-host=/var/run/openvassd.sock"     # Scanner unix socket
-OPENVAS_MANAGER_GNUTLS_PRIORITIES="--gnutls-priorities=SECURE256:+SUITEB192:+SECURE192:+SECURE128:+SUITEB128:-MD5:-SHA1:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-SSL3.0"
+# Greenbone Vulnerability Manager daemon command args
+GVMD_OPTIONS=""                                                           # e.g --foreground
+GVMD_PORT="--port=9390"                                                   # Manager listen port
+GVMD_LISTEN_ADDRESS="--listen=127.0.0.1"                                  # Manager listen address
+GVMD_SCANNER_HOST="--scanner-host=/var/run/openvassd.sock"                # Scanner unix socket
+GVMD_GNUTLS_PRIORITIES="--gnutls-priorities=SECURE256:+SUITEB192:+SECURE192:+SECURE128:+SUITEB128:-MD5:-SHA1:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-SSL3.0"
 
-# OpenVAS Scanner command args
+# OpenVAS Scanner daemon command args
 OPENVAS_SCANNER_OPTIONS=""                                                # e.g --foreground
 OPENVAS_SCANNER_LISTEN_SOCKET="--unix-socket=/var/run/openvassd.sock"     # Scanner listen socket
 
-# OpenVAS Security Assistant command args for reverse proxying | SSL PassThrough
-OPENVAS_SECURITY_ASSISTANT_OPTIONS="--no-redirect"                        # Don't listen port 80 anymore for reverse proxy
-OPENVAS_SECURITY_ASSISTANT_LISTEN_ADDRESS="--listen=127.0.0.1"            # WebUI adress
-OPENVAS_SECURITY_ASSISTANT_LISTEN_PORT="--port=9392"                      # WebUI Port
-OPENVAS_SECURITY_ASSISTANT_MANAGER_LISTEN_ADDRESS="--mlisten=127.0.0.1"   # WebUI Manager Address
-OPENVAS_SECURITY_ASSISTANT_MANAGER_PORT="--mport=9390"                    # WebUI Manager Port
-OPENVAS_SECURITY_ASSISTANT_GNUTLS_PRIORITIES="--gnutls-priorities=NORMAL" # TLS Settings
+# Greenbone Security Assistant daemon command args
+GSAD_OPTIONS="--no-redirect"                                              # Don't listen port 80 anymore for reverse proxy
+GSAD_LISTEN_ADDRESS="--listen=127.0.0.1"                                  # WebUI adress
+GSAD_LISTEN_PORT="--port=9392"                                            # WebUI Port
+GSAD_MANAGER_LISTEN_ADDRESS="--mlisten=127.0.0.1"                         # WebUI Manager Address
+GSAD_MANAGER_PORT="--mport=9390"                                          # WebUI Manager Port
+GSAD_GNUTLS_PRIORITIES="--gnutls-priorities=NORMAL"                       # TLS Settings
 
 #####################################################################################################
 
@@ -36,10 +36,10 @@ source /etc/environment &>/dev/null
 source ~/.bash_profile &>/dev/null
 
 # Check the needed executables.They are in our environment and have +x?
-if ! [ -x "$(command -v openvasmd)" ] ||
+if ! [ -x "$(command -v gvmd)" ] ||
    ! [ -x "$(command -v openvassd)" ] ||
    ! [ -x "$(command -v redis-server)" ] ||
-   ! [ -x "$(command -v openvas-manage-certs)" ] ||
+   ! [ -x "$(command -v gvm-manage-certs)" ] ||
    ! [ -x "$(command -v greenbone-nvt-sync)" ] ||
    ! [ -x "$(command -v greenbone-scapdata-sync)" ] ||
    ! [ -x "$(command -v greenbone-certdata-sync)" ]; then
@@ -48,13 +48,13 @@ if ! [ -x "$(command -v openvasmd)" ] ||
         path="0"
 fi
 
-# Check Security-Assistant is exist
+# Check Greenbone Security Assistant is exist
 if ! [ -x "$(command -v gsad)" ]; then
      gsad="1"
      else
          gsad="0"
 fi
-# Executables are not in our environment
+# Executables are not in our environment !
 if [ $path -eq 1 ]; then
    echo "Can't find executables! If you installed OpenVAS to specific location e.g. /opt"
    echo "please add these PATHS to /etc/profile,also sure that they are executable"
@@ -97,7 +97,7 @@ if [ $systemctl -eq 1 ] && [ $open_rc -eq 0 ]; then
    redis_init="0"
 fi
 
-# Check status of OpenVAS-Scanner systemd unit
+# Check status of Openvas Scanner systemd unit
 if [ $systemctl -eq 0 ] &&
    ([ "$(systemctl is-active openvas-scanner.service)" = "active" ] ||
    [ "$(systemctl list-unit-files | grep 'enabled' | grep 'openvas-scanner.service' | awk '{print $1}')" = "openvas-scanner.service" ]); then
@@ -106,7 +106,7 @@ if [ $systemctl -eq 0 ] &&
       scanner="1"
 fi
 
-# Check status of OpenVAS-Manager systemd unit
+# Check status of Greenbone Vulnerability Manager systemd unit
 if [ $systemctl -eq 0 ] &&
    ([ "$(systemctl is-active gvmd.service)" = "active" ] ||
    [ "$(systemctl list-unit-files | grep 'enabled' | grep 'gvmd.service' | awk '{print $1}')" = "gvmd.service" ]); then
@@ -115,7 +115,7 @@ if [ $systemctl -eq 0 ] &&
       manager="1"
 fi
 
-# Check status of OpenVAS-Assistant systemd unit
+# Check status of Greenbone Security Assistant systemd unit
 if [ $systemctl -eq 0 ] &&
    ([ "$(systemctl is-active gsa.service)" = "active" ] ||
    [ "$(systemctl list-unit-files | grep 'enabled' | grep 'gsa.service' | awk '{print $1}')" = "gsa.service" ]); then
@@ -135,7 +135,7 @@ fi
 
 # We need to find correct service name for restarting.
 if [ $scanner -eq 1 ] || [ $manager -eq 1 ] || [ $assistant -eq 1 ] || [ $redis -eq 1 ]; then
-   WHICHM="ExecStart=$(type openvasmd | awk '{print $3}')"
+   WHICHM="ExecStart=$(type gvmd | awk '{print $3}')"
    WHICHS="ExecStart=$(type openvassd | awk '{print $3}')"
    WHICHA="ExecStart=$(type gsad | awk '{print $3}')"
    WHICHR="ExecStart=$(type redis-server | awk '{print $3}')"
@@ -177,10 +177,10 @@ if [ $scanner -eq 1 ] || [ $manager -eq 1 ] || [ $assistant -eq 1 ] || [ $redis 
 
    if [ -n "$manager_service" ] && [ $manager -eq 1 ]; then
       if [ "$(systemctl list-unit-files | grep 'enabled' | grep $manager_service | awk '{print $1}')" = "$manager_service" ]; then
-         echo "systemd --> OpenVAS Manager '$manager_service' found."
+         echo "systemd --> Greenbone Vulnerability Manager '$manager_service' found."
          else
             echo "systemd --> '$manager_service' found but not enabled."
-            echo "are you sure this is the correct systemd service for Openvas Manager"
+            echo "are you sure this is the correct systemd service for Greenbone Vulnerability Manager"
             while true; do
     	       read -n 1 -p "do you want to enable '$manager_service'? --> (Y)es | (N)o | (Q)uit" answer
                echo
@@ -253,7 +253,7 @@ if [ $scanner -eq 1 ] || [ $manager -eq 1 ] || [ $assistant -eq 1 ] || [ $redis 
 
    if [ $COUNTM -gt 1 ] || [ $COUNTS -gt 1 ] || [ $COUNTR -gt 1 ]; then
       echo "you have more than one enabled systemd service for single daemon"
-      echo " check OpenVAS and Redis systemd unit files to fix it"
+      echo " check GVM and Redis systemd unit files to fix it"
       exit 1
    fi
 fi
@@ -314,7 +314,7 @@ GREEN="`tput setaf 2`"
 RED="`tput setaf 1`"
 norm="`tput sgr0`"
 echo "creating WebUI User.."
-openvasmd --create-user=admin --role=Admin &>/tmp/openvas_user.out
+gvmd --create-user=admin --role=Admin &>/tmp/openvas_user.out
 if [ $? -eq 0 ]; then
       username="admin"
       password="$(cat /tmp/openvas_user.out | awk '{print $5}' | cut -c2-)"
@@ -324,17 +324,17 @@ if [ $? -eq 0 ]; then
       else
           echo "$(cat /tmp/openvas_user.out)"
           echo "these are active users for WebUI"
-          openvasmd --get-users
+          gvmd --get-users
 fi
 rm -rf /tmp/openvas_user.out
 }
 
 # Redis & OpenVAS Scanner socket connection check for Gentoo/Linux
 if [[ -e /etc/redis.conf ]]; then
-   if [ "$(openvassd -s | grep 'kb_location' | awk '{print $3}')" = "$(cat /etc/redis.conf | grep -P '(^|\s)\Kunixsocket(?=\s|$)' | awk '{print $2}')" ]; then
+   if [ "$(openvassd -s | grep 'db_address' | awk '{print $3}')" = "$(cat /etc/redis.conf | grep -P '(^|\s)\Kunixsocket(?=\s|$)' | awk '{print $2}')" ]; then
       echo "redis server properly configured."
       else
-          redis_sock="$(openvassd -s | grep 'kb_location' | awk '{print $3}')"
+          redis_sock="$(openvassd -s | grep 'db_address' | awk '{print $3}')"
           echo "redis server is not properly configured."
           echo "be sure redis server listening unix socket at $redis_sock"
           echo "you can find example redis.conf file in /etc/openvas/redis.conf.example"
@@ -344,10 +344,10 @@ fi
 
 # Redis & OpenVAS Scanner socket connection check for other linux distros
 if [[ -e /etc/redis/redis.conf ]]; then
-   if [ "$(openvassd -s | grep 'kb_location' | awk '{print $3}')" = "$(cat /etc/redis/redis.conf | grep -P '(^|\s)\Kunixsocket(?=\s|$)' | awk '{print $2}')" ]; then
+   if [ "$(openvassd -s | grep 'db_address' | awk '{print $3}')" = "$(cat /etc/redis/redis.conf | grep -P '(^|\s)\Kunixsocket(?=\s|$)' | awk '{print $2}')" ]; then
       echo "redis server properly configured."
       else
-          redis_sock="$(openvassd -s | grep 'kb_location' | awk '{print $3}')"
+          redis_sock="$(openvassd -s | grep 'db_address' | awk '{print $3}')"
           echo "redis server is not properly configured."
           echo "be sure redis server listening unix socket at $redis_sock"
           exit 1
@@ -355,11 +355,11 @@ if [[ -e /etc/redis/redis.conf ]]; then
 fi
 
 # Create certificates for fresh install
-openvas-manage-certs -a &>/dev/null
+gvm-manage-certs -a &>/dev/null
 if [ $? -eq 0 ]; then
    echo "certificates created."
 
-elif [ "$(openvas-manage-certs -a | grep -ow 'Existing')" = "Existing" ]; then
+elif [ "$(gvm-manage-certs -a | grep -ow 'Existing')" = "Existing" ]; then
      echo "certificates already created."
 
 else
@@ -410,8 +410,6 @@ if [ $? -eq 0 ]; then
           # Check OpenVAS-Scanner is running
           if ps aux | grep -v "grep" | grep -P "(^|\s)\Kopenvassd:(?=\s|$)" &>/dev/null; then
              echo "OpenVAS-Scanner is running."
-             echo "building Database this will take some time.."
-             openvasmd --rebuild --progress &>/dev/null
           elif [ $scanner -eq 0 ]; then
                # Start OpenVAS-Scanner systemd unit & Rebuild Cache
                echo "systemd --> OpenVAS-Scanner is not running! trying to up.."
@@ -423,9 +421,6 @@ if [ $? -eq 0 ]; then
                   echo "waiting for OpenVAS-Scanner to become ready.."
                   done
                   echo "systemd --> openvas-scanner.service started and waiting for connection."
-                  echo "building database this will take some time.."
-                  # Rebuild Cache
-                  openvasmd --rebuild --progress &>/dev/null
                   else
                       echo "systemd --> openvas-scanner.service cannot started.."
                       exit 1
@@ -440,9 +435,6 @@ if [ $? -eq 0 ]; then
                   echo "waiting for OpenVAS-Scanner to become ready.."
                   done
                   echo "systemd --> $scanner_service is started and waiting for connection."
-                  echo "building database this will take some time.."
-                  # Rebuild Cache
-                  openvasmd --rebuild --progress &>/dev/null
                   else
                       echo "systemd --> $scanner_service cannot started.."
                       exit 1
@@ -458,9 +450,6 @@ if [ $? -eq 0 ]; then
                   echo "waiting for OpenVAS-Scanner to become ready.."
                   done
                   echo "rc-service --> openvas-scanner started and waiting for connection."
-                  echo "building database this will take some time.."
-                  # Rebuild Cache
-                  openvasmd --rebuild --progress &>/dev/null
                   else
                       echo "rc-service --> openvas-scanner cannot started.."
                       exit 1
@@ -479,13 +468,9 @@ if [ $? -eq 0 ]; then
                       exit 1
                fi
                echo "OpenVAS-Scanner started manually and waiting for connection."
-               echo "building database this will take some time.."
-               # Rebuild Cache
-               openvasmd --rebuild --progress &>/dev/null
           fi
            # Check status
            if [ $? -eq 0 ]; then
-              echo "building database is done"
               create_user
               # Restart OpenVAS-Scanner
               if [ $scanner -eq 0 ]; then
@@ -517,7 +502,7 @@ if [ $? -eq 0 ]; then
                   echo "OpenVAS-Scanner is restarted."
                   # Restart OpenVAS-Manager
                   if [ $manager -eq 0 ]; then
-                     ps aux | grep -v "grep" | grep -P "(^|\s)\Kopenvasmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
+                     ps aux | grep -v "grep" | grep -P "(^|\s)\Kgvmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
                      sleep 5
                      systemctl restart gvmd.service &>/dev/null
                      if [ $? -eq 0 ]; then
@@ -530,7 +515,7 @@ if [ $? -eq 0 ]; then
                             exit 1
                      fi
                   elif [[ -n "$manager_service" ]]; then
-                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kopenvasmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
+                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kgvmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
                        sleep 5
                        systemctl restart "$manager_service" &>/dev/null
                        if [ $? -eq 0 ]; then
@@ -543,7 +528,7 @@ if [ $? -eq 0 ]; then
                               exit 1
                        fi
                   elif [[ -n "$manager_init" ]]; then
-                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kopenvasmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
+                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kgvmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
                        sleep 5
                        rc-service gvmd start &>/dev/null
                        if [ $? -eq 0 ]; then
@@ -556,9 +541,9 @@ if [ $? -eq 0 ]; then
                               exit 1
                        fi
                   else
-                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kopenvasmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
+                       ps aux | grep -v "grep" | grep -P "(^|\s)\Kgvmd(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
                        sleep 5
-                       openvasmd "$OPENVAS_MANAGER_OPTIONS" "$OPENVAS_MANAGER_PORT" "$OPENVAS_MANAGER_LISTEN_ADDRESS" "$OPENVAS_MANAGER_SCANNER_HOST" "$OPENVAS_MANAGER_GNUTLS_PRIORITIES" &>/dev/null
+                       gvmd "$GVMD_OPTIONS" "$GVMD_PORT" "$GVMD_LISTEN_ADDRESS" "$GVMD_SCANNER_HOST" "$GVMD_GNUTLS_PRIORITIES" &>/dev/null
                        if [ $? -eq 0 ]; then
                           success="0"
                           echo "OpenVAS-Manager is restarted manually"
@@ -624,7 +609,7 @@ if [[ -n "$success" ]] && [ $gsad -eq 0 ]; then
       else
            ps aux | grep -v "grep" | grep -P "(^|\s)\K$WHICHA(?=\s|$)" | awk '{print $2}' | xargs kill -9 &>/dev/null
            sleep 5
-           gsad "$OPENVAS_SECURITY_ASSISTANT_OPTIONS" "$OPENVAS_SECURITY_ASSISTANT_LISTEN_ADDRESS" "$OPENVAS_SECURITY_ASSISTANT_LISTEN_PORT" "$OPENVAS_SECURITY_ASSISTANT_MANAGER_LISTEN_ADDRESS" "$OPENVAS_SECURITY_ASSISTANT_MANAGER_LISTEN_PORT" "$OPENVAS_SECURITY_ASSISTANT_GNUTLS_PRIORITIES" &>/dev/null
+           gsad "$GSAD_OPTIONS" "$GSAD_LISTEN_ADDRESS" "$GSAD_LISTEN_PORT" "$GSAD_MANAGER_LISTEN_ADDRESS" "$GSAD_MANAGER_LISTEN_PORT" "$GSAD_GNUTLS_PRIORITIES" &>/dev/null
            if [ $? -eq 0 ]; then
               echo "OpenVAS WebUI is restarted"
               else

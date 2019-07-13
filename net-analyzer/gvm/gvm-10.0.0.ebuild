@@ -5,7 +5,7 @@ EAPI=7
 
 inherit eutils
 
-DESCRIPTION="A remote vulnerability scanner & vulnerability manager,previously named OpenVAS"
+DESCRIPTION="Greenbone Vulnerability Management,previously named OpenVAS"
 HOMEPAGE="https://www.greenbone.net/en/"
 
 SLOT="0"

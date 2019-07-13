@@ -99,10 +99,6 @@ src_install() {
 		gvm-feed-sync
 	fi
 
-	insinto /etc/openvas/scripts
-	doins "${FILESDIR}"/openvas-feed-sync "${FILESDIR}"/first-start
-	fperms 0755 /etc/openvas/scripts/{openvas-feed-sync,first-start}
-
 	newinitd "${FILESDIR}/${PN}.init" ${PN}
 	newconfd "${FILESDIR}/${PN}-daemon.conf" ${PN}
 

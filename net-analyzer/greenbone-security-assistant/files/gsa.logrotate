@@ -1,9 +1,15 @@
-# logrotate for openvas security agent
-/var/log/openvas/gsad.log {
+# logrotate for Greenbone Security Assistant
+/var/log/gvm/gsad.log {
 	daily
 	rotate 7
+	sharedscripts
 	compress
+	create
 	missingok
 	notifempty
-	sharedscripts
+	dateext
+	dateformat -%Y-%m-%d.log
+	postrotate
+		/bin/kill -HUP `cat /var/run/gsad.pid 2>/dev/null` 2>/dev/null || true
+	endscript
 }

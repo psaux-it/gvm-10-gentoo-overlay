@@ -1,15 +1,10 @@
-# logrotate for openvas scanner
+# Copyright 1999-2019 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
 /var/log/gvm/openvassd.log {
-	daily
-	rotate 7
 	sharedscripts
-	maxsize 10M
-	compress
-	create
 	missingok
 	notifempty
-	dateext
-	dateformat -%Y-%m-%d.log
 	postrotate
 		/bin/kill -HUP `cat /var/run/openvassd.pid 2>/dev/null` 2>/dev/null || true
 	endscript

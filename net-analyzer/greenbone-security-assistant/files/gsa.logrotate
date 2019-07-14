@@ -1,14 +1,10 @@
-# logrotate for Greenbone Security Assistant
+# Copyright 1999-2019 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
 /var/log/gvm/gsad.log {
-	daily
-	rotate 7
 	sharedscripts
-	compress
-	create
 	missingok
 	notifempty
-	dateext
-	dateformat -%Y-%m-%d.log
 	postrotate
 		/bin/kill -HUP `cat /var/run/gsad.pid 2>/dev/null` 2>/dev/null || true
 	endscript

@@ -42,7 +42,10 @@ BDEPEND="
 	)"
 
 PATCHES=(
+	# GLIBC malloc-trim patch.
 	"${FILESDIR}/${P}-malloc-trim.patch"
+	# Fix pid dir.
+	"${FILESDIR}/${P}-pid.patch"
 )
 
 src_prepare() {

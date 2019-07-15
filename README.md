@@ -98,6 +98,7 @@ Then run:
  - ospd       --> Scanner wrappers which share the same communication protocol
  - postgres   --> Use PostgreSQL for data storage
  - radius     --> Radius Support for Greenbone Vulnerability Management
+ - sqlite     --> Use SQLite for data storage
 
 ## Scripts
 

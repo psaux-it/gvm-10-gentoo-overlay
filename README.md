@@ -96,6 +96,7 @@ Then run:
  - gsa        --> Greenbone Security Assistant (WebUI)
  - ldap       --> LDAP Support for Greenbone Vulnerability Management
  - ospd       --> Scanner wrappers which share the same communication protocol
+ - postgres   --> Use PostgreSQL for data storage
  - radius     --> Radius Support for Greenbone Vulnerability Management
 
 ## Scripts

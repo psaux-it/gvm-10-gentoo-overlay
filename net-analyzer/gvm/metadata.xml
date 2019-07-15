@@ -16,7 +16,7 @@
 		<flag name="gsa">Greenbone Security Assistant (WebUI)</flag>
 		<flag name="ldap">Enable support for ldap</flag>
 		<flag name="ospd">Enable support for scanner wrappers</flag>
-		<flag name="postgres">Enable PostgreSQL database backend</flag>
+		<flag name="postgres">Use PostgreSQL for data storage</flag>
 		<flag name="radius">Enable support for radius</flag>
 	</use>
 	<longdescription lang="en">

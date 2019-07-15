@@ -50,9 +50,9 @@ PATCHES=(
 
 src_prepare() {
 	cmake-utils_src_prepare
+	# QA-Fix | Remove doxygen warnings for !CLANG
 	if use extras; then
 		if ! tc-is-clang; then
-		   # QA-Fix doxygen warning for CLANG.
 		   for f in doc/*.in
 		   do
 			sed \

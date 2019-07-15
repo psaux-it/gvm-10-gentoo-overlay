@@ -66,7 +66,7 @@ src_prepare() {
 	mv "${WORKDIR}/${MY_NODE_N}" "${MY_NODE_DIR}" || die "couldn't move node_modules"
 	# Update .yarnrc accordingly.
 	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}"/gsa/.yarnrc || die "echo failed"
-	# QA-Fix doxygen warning for CLANG.
+	# QA-Fix | Remove doxygen warnings for !CLANG.
 	if use extras; then
 		if ! tc-is-clang; then
 		   for f in gsad/doc/*.in

@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils systemd toolchain-funcs
+inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 MY_PN="openvas"
 
@@ -80,6 +80,9 @@ src_configure() {
 		"-DLOCALSTATEDIR=${EPREFIX}/var"
 		"-DSYSCONFDIR=${EPREFIX}/etc"
 	)
+	# Add release hardening flags for 6.0.0
+	append-cflags -Wno-format-truncation -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -fstack-protector
+	append-ldflags -Wl,-z,relro -Wl,-z,now
 	cmake-utils_src_configure
 }
 

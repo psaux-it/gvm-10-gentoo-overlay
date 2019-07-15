@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils flag-o-matic systemd
+inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 DESCRIPTION="Greenbone vulnerability manager daemon, previously named openvas-manager"
 HOMEPAGE="https://www.greenbone.net/en/"
@@ -45,11 +45,20 @@ PATCHES=(
 
 src_prepare() {
 	cmake-utils_src_prepare
-	# Fix the ebuild to use correct FHS/Gentoo policy paths for 8.0.0
+	# QA-Fix | Use correct FHS/Gentoo policy paths for 8.0.0
 	sed -i "s*share/doc/gvm/html/*share/doc/gvmd-${PV}/html/*g" "$S"/doc/CMakeLists.txt || die
 	sed -i "s*/doc/gvm/*/doc/gvmd-${PV}/*g" "$S"/CMakeLists.txt || die
+	# QA-Fix | Remove Doxygen warnings for !CLANG
 	if use extras; then
-		doxygen -u "$S"/doc/Doxyfile_full.in || die
+		if ! tc-is-clang; then
+		   for f in doc/*.in
+		   do
+			sed \
+			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+			-i "${f}" || die "couldn't disable CLANG parsing"
+		   done
+		fi
 	fi
 }
 
@@ -59,7 +68,7 @@ src_configure() {
 		"-DLOCALSTATEDIR=${EPREFIX}/var"
 		"-DSYSCONFDIR=${EPREFIX}/etc"
 	)
-	# Fix runtime QA error for 8.0.0
+	# QA-Fix | Disable false-positive warnings for 8.0.0
 	append-cflags -Wno-nonnull
 	cmake-utils_src_configure
 }
@@ -76,31 +85,17 @@ src_compile() {
 
 src_install() {
 	cmake-utils_src_install
-	# Migration from opevas-manager-7 to gvmd-8
-	if has_version '=net-analyzer/openvas-manager-7.0.3'; then
-	   mv /etc/openvas/{pwpolicy.conf,gsf-access-key} /etc/gvm/
-	   mv /etc/openvas/openvasmd_log.conf /etc/gvm/gvmd_log.conf
-	   mv /var/lib/openvas/scap-data /var/lib/gvm/scap-data
-	   mv /var/lib/openvas/cert-data /var/lib/gvm/cert-data
-	   mv /var/lib/openvas/openvasmd /var/lib/gvm/gvmd
-	   mv /var/lib/openvas/CA /var/lib/gvm/CA
-	   mv /var/lib/openvas/private /var/lib/gvm/private
-	   if has version '>=dev-db/sqlite-3.25*'; then
-	      mv /var/lib/openvas/mgr/tasks.db /var/lib/gvm/gvmd/gvmd.db
-	      gvmd --migrate
-	   fi
-	fi
 
 	insinto /etc/gvm/sysconfig
-	doins "${FILESDIR}"/${PN}-daemon.conf
+	doins "${FILESDIR}/${PN}-daemon.conf"
 
-	newinitd "${FILESDIR}/${PN}.init" ${PN}
-	newconfd "${FILESDIR}/${PN}-daemon.conf" ${PN}
+	newinitd "${FILESDIR}/${PN}.init" "${PN}"
+	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${PN}.logrotate" ${PN}
+	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
-	systemd_dounit "${FILESDIR}"/${PN}.service
+	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	keepdir /var/lib/gvm/gvmd
 }

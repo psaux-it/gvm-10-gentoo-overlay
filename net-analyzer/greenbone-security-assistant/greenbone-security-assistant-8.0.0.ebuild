@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils systemd
+inherit cmake-utils systemd toolchain-funcs
 
 MY_PN="gsa"
 MY_NODE_N="node_modules"
@@ -12,7 +12,7 @@ MY_NODE_N="node_modules"
 DESCRIPTION="Greenbone security assistant"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	 https://github.com/greenbone/gsa/releases/download/v8.0.0/gsa-node-modules-8.0.0.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
+	 https://github.com/greenbone/${MY_PN}/releases/download/v${PV}/${MY_PN}-${MY_NODE_N}-${PV}.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
 
 SLOT="0"
 LICENSE="GPL-2+"
@@ -63,11 +63,20 @@ PATCHES=(
 src_prepare() {
 	cmake-utils_src_prepare
 	# We will use pre-fetched node_modules.
-	mv "${WORKDIR}/${MY_NODE_N}" "${MY_NODE_DIR}" || die
-	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}"/gsa/.yarnrc || die
-	# Update doxy file.
+	mv "${WORKDIR}/${MY_NODE_N}" "${MY_NODE_DIR}" || die "couldn't move node_modules"
+	# Update .yarnrc accordingly.
+	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}"/gsa/.yarnrc || die "echo failed"
+	# QA-Fix doxygen warning for CLANG.
 	if use extras; then
-		doxygen -u "$S"/gsad/doc/Doxyfile_full.in || die
+		if ! tc-is-clang; then
+		   for f in gsad/doc/*.in
+		   do
+			sed \
+			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+			-i "${f}" || die "couldn't disable CLANG parsing"
+		   done
+		fi
 	fi
 }
 
@@ -94,17 +103,17 @@ src_install() {
 	cmake-utils_src_install
 
 	insinto /etc/gvm/sysconfig
-	doins "${FILESDIR}"/${MY_PN}-daemon.conf
+	doins "${FILESDIR}/${MY_PN}-daemon.conf"
 
 	insinto /etc/gvm/reverse-proxy
 	doins "${FILESDIR}"/gsa.nginx.reverse.proxy.example
 
-	newinitd "${FILESDIR}/${MY_PN}.init" ${MY_PN}
-	newconfd "${FILESDIR}/${MY_PN}-daemon.conf" ${MY_PN}
+	newinitd "${FILESDIR}/${MY_PN}.init" "${MY_PN}"
+	newconfd "${FILESDIR}/${MY_PN}-daemon.conf" "${MY_PN}"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${MY_PN}.logrotate" ${MY_PN}
+	newins "${FILESDIR}/${MY_PN}.logrotate" "${MY_PN}"
 
-	systemd_newtmpfilesd "${FILESDIR}/${MY_PN}.tmpfiles.d" ${MY_PN}.conf
-	systemd_dounit "${FILESDIR}"/${MY_PN}.service
+	systemd_newtmpfilesd "${FILESDIR}/${MY_PN}.tmpfiles.d" "${MY_PN}".conf
+	systemd_dounit "${FILESDIR}/${MY_PN}.service"
 }

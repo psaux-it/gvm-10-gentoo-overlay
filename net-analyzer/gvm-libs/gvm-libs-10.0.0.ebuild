@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils
+inherit cmake-utils toolchain-funcs
 
 DESCRIPTION="Greenbone vulnerability management libraries, previously named openvas-libraries"
 HOMEPAGE="https://www.greenbone.net/en/"
@@ -51,7 +51,16 @@ PATCHES=(
 src_prepare() {
 	cmake-utils_src_prepare
 	if use extras; then
-		doxygen -u "$S"/doc/Doxyfile_full.in || die
+		if ! tc-is-clang; then
+		   # QA-Fix doxygen warning for CLANG.
+		   for f in doc/*.in
+		   do
+			sed \
+			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+			-i "${f}" || die "couldn't disable CLANG parsing"
+		   done
+		fi
 	fi
 }
 

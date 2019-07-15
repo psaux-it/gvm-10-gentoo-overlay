@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils systemd
+inherit cmake-utils systemd toolchain-funcs
 
 MY_PN="openvas"
 
@@ -50,7 +50,7 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 PATCHES=(
 	# Musl fix.
 	"${FILESDIR}/${P}-execinfo-musl-fix.patch"
-	# Revision 6.0.1 --> #296 #301 #308 #312 #321 #330
+	# Revision 6.0.1 | upstream #296 #301 #308 #312 #321 #330
 	"${FILESDIR}/${P}-cumulative.patch"
 	# GLIBC malloc-trim patch.
 	"${FILESDIR}/${P}-malloc-trim.patch"
@@ -58,10 +58,19 @@ PATCHES=(
 
 src_prepare() {
 	cmake-utils_src_prepare
-	# Fix for correct FHS/Gentoo policy paths for 6.0.0
+	# QA-Fix | Correct FHS/Gentoo policy paths for 6.0.0
 	sed -i "s*/doc/openvas-scanner/*/doc/openvas-scanner-${PV}/*g" "$S"/src/CMakeLists.txt || die
+	# QA-Fix | Remove Doxygen warning for !CLANG.
 	if use extras; then
-		doxygen -u "$S"/doc/Doxyfile_full.in || die
+		if ! tc-is-clang; then
+		   for f in doc/*.in
+		   do
+			sed \
+			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+			-i "${f}" || die "couldn't disable CLANG parsing"
+		   done
+		fi
 	fi
 }
 
@@ -91,7 +100,7 @@ src_install() {
 	doins "${FILESDIR}"/openvassd.conf "${FILESDIR}"/redis.conf.example
 
 	insinto /etc/openvas/sysconfig
-	doins "${FILESDIR}"/${PN}-daemon.conf
+	doins "${FILESDIR}/${PN}-daemon.conf"
 
 	if use cron; then
 		# Install the cron job if they want it.
@@ -100,14 +109,14 @@ src_install() {
 		gvm-feed-sync
 	fi
 
-	newinitd "${FILESDIR}/${PN}.init" ${PN}
-	newconfd "${FILESDIR}/${PN}-daemon.conf" ${PN}
+	newinitd "${FILESDIR}/${PN}.init" "${PN}"
+	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${PN}.logrotate" ${PN}
+	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
-	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" ${PN}.conf
-	systemd_dounit "${FILESDIR}"/${PN}.service
+	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
+	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	keepdir /var/log/gvm

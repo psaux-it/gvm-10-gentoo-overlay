@@ -12,6 +12,7 @@
 	<use>
 		<flag name="extras">Html docs support</flag>
 		<flag name="postgres">Use PostgreSQL for data storage</flag>
+		<flag name="sqlite">Use SQLite for data storage</flag>
 	</use>
 	<longdescription lang="en">
 	The Greenbone Vulnerability Manager is the central management service between security scanners and the user clients.

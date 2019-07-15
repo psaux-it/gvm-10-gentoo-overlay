@@ -18,6 +18,7 @@
 		<flag name="ospd">Enable support for scanner wrappers</flag>
 		<flag name="postgres">Use PostgreSQL for data storage</flag>
 		<flag name="radius">Enable support for radius</flag>
+		<flag name="sqlite">Use SQLite for data storage</flag>
 	</use>
 	<longdescription lang="en">
 	GVM previously named OpenVAS stands for Open Vulnerability Assessment System and is a network security scanner 

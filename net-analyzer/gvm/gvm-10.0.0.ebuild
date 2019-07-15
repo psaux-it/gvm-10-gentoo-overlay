@@ -11,11 +11,12 @@ HOMEPAGE="https://www.greenbone.net/en/"
 SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="~amd64 ~x86"
-IUSE="cli +cron +extras +gsa ldap +ospd postgres radius"
+IUSE="cli +cron +extras +gsa ldap +ospd postgres radius +sqlite"
+REQUIRED_USE="|| ( postgres sqlite )"
 
 RDEPEND="
 	>=net-analyzer/gvm-libs-10.0.0[extras?,ldap?,radius?]
-	>=net-analyzer/gvmd-8.0.0[extras?,postgres?]
+	>=net-analyzer/gvmd-8.0.0[extras?,postgres?,sqlite?]
 	>=net-analyzer/openvas-scanner-6.0.0[cron?,extras?]
 	!net-analyzer/openvas
 	cli? ( >=net-analyzer/gvm-tools-1.4.1 )

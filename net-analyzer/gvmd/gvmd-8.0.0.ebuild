@@ -13,17 +13,18 @@ SRC_URI="https://github.com/greenbone/gvmd/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 SLOT="0"
 LICENSE="GPL-2+"
 KEYWORDS="~amd64 ~x86"
-IUSE="extras postgres"
+IUSE="extras postgres sqlite"
+REQUIRED_USE="|| ( postgres sqlite )"
 
 DEPEND="
-	dev-db/sqlite:3
 	dev-libs/libgcrypt:0=
 	dev-libs/libical
 	>=net-analyzer/gvm-libs-10.0.0
 	net-libs/gnutls:=[tools]
 	extras?   ( app-text/xmlstarlet
 		    dev-texlive/texlive-latexextra )
-	postgres? ( dev-db/postgresql )"
+	postgres? ( dev-db/postgresql:* )
+	sqlite?   ( dev-db/sqlite:3 )"
 
 RDEPEND="
 	${DEPEND}

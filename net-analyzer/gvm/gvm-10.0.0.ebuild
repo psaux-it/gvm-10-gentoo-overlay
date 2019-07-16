@@ -25,7 +25,7 @@ RDEPEND="
 
 pkg_postinst() {
 	elog "----------------------------IMPORTANT----------------------------"
-	elog " Please read important notes > /usr/share/gvm/GVM.gentoo "
+	elog " You can find detailed instruction > /usr/share/gvm/GVM.gentoo   "
 	elog "-----------------------------------------------------------------"
 	elog "Additional support for extra checks can be get from"
 	optfeature "Web server scanning and testing tool" net-analyzer/nikto

@@ -6,7 +6,7 @@ EAPI=7
 CMAKE_MAKEFILE_GENERATOR="emake"
 inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
-DESCRIPTION="Greenbone vulnerability manager daemon, previously named openvas-manager"
+DESCRIPTION="Greenbone vulnerability manager, previously named openvas-manager"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/gvmd/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 

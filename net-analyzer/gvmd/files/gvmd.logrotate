@@ -1,11 +1,13 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+# Daemon ignore HUP so we use 'copytruncate' instead of 'create' 
+# with safe file size to prevent losing log entries.
 
 /var/log/gvm/gvmd.log {
-	sharedscripts
+	compress
 	missingok
 	notifempty
-	postrotate
-                /bin/kill -HUP `cat /var/run/gvmd.pid 2>/dev/null` 2>/dev/null || true
-        endscript
+	sharedscripts
+	copytruncate
+	maxsize 10M
 }

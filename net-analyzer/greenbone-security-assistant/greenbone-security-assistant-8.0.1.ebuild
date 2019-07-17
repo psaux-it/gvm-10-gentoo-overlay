@@ -118,6 +118,5 @@ src_install() {
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}/${MY_DN}.logrotate" "${MY_DN}"
 
-	systemd_newtmpfilesd "${FILESDIR}/${MY_DN}.tmpfiles.d" "${MY_DN}".conf
 	systemd_dounit "${FILESDIR}/${MY_DN}.service"
 }

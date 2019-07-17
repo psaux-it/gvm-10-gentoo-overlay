@@ -13,7 +13,7 @@ MY_NODE_N="node_modules"
 DESCRIPTION="Greenbone Security Assistant"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	 https://github.com/greenbone/${MY_PN}/releases/download/v${PV}/${MY_PN}-${MY_NODE_N}-${PV}.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
+	 https://github.com/greenbone/gsa/releases/download/v8.0.1/gsa-node-modules-8.0.1.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
 
 SLOT="1"
 LICENSE="GPL-2+"

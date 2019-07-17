@@ -8,7 +8,7 @@ inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 MY_PN="openvas"
 
-DESCRIPTION="OpenVAS remote network security scanner"
+DESCRIPTION="Open Vulnerability Assessment Scanner"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/openvas-scanner/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 

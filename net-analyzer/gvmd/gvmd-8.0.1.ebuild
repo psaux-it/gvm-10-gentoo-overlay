@@ -19,7 +19,7 @@ REQUIRED_USE="|| ( postgres sqlite )"
 DEPEND="
 	dev-libs/libgcrypt:0=
 	dev-libs/libical
-	>=net-analyzer/gvm-libs-10.0.0
+	>=net-analyzer/gvm-libs-10.0.1
 	net-libs/gnutls:=[tools]
 	extras?   ( app-text/xmlstarlet
 		    dev-texlive/texlive-latexextra )

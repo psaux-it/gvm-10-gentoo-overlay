@@ -24,7 +24,7 @@ DEPEND="
 	dev-libs/libgcrypt:0=
 	dev-libs/libxslt
 	dev-python/polib
-	>=net-analyzer/gvm-libs-10.0.0
+	>=net-analyzer/gvm-libs-10.0.1
 	net-libs/gnutls:=
 	net-libs/libmicrohttpd[messages]
 	>=net-libs/nodejs-8.12.0

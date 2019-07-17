@@ -22,7 +22,7 @@ DEPEND="
 	dev-db/redis
 	dev-libs/libgcrypt:=
 	dev-libs/libksba
-	>=net-analyzer/gvm-libs-10.0.0
+	>=net-analyzer/gvm-libs-10.0.1
 	net-analyzer/net-snmp
 	net-libs/gnutls:=
 	net-libs/libpcap
@@ -31,6 +31,7 @@ DEPEND="
 
 RDEPEND="
 	${DEPEND}
+	!net-analyzer/openvas-scanner:0
 	!net-analyzer/openvas-tools"
 
 BDEPEND="

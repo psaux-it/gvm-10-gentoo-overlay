@@ -55,8 +55,6 @@ PATCHES=(
 	"${FILESDIR}/${P}-yarn-install.patch"
 	# Fix react-env path.
 	"${FILESDIR}/${P}-react-env.patch"
-	# Fix build error for 8.0.0.
-	"${FILESDIR}/${P}-revision_8.0.1.patch"
 	# Remove yarn terminal output.
 	"${FILESDIR}/${P}-command.patch"
 )

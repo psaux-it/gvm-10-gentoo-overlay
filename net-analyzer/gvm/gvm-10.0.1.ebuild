@@ -17,10 +17,10 @@ REQUIRED_USE="|| ( postgres sqlite )"
 RDEPEND="
 	>=net-analyzer/gvm-libs-10.0.1[extras?,ldap?,radius?]
 	>=net-analyzer/gvmd-8.0.1[extras?,postgres?,sqlite?]
-	>=net-analyzer/openvas-scanner-6.0.1[cron?,extras?]
+	>=net-analyzer/openvas-scanner-6.0.1:1[cron?,extras?]
 	!net-analyzer/openvas
 	cli? ( >=net-analyzer/gvm-tools-1.4.1 )
-	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.1[extras?] )
+	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.1:1[extras?] )
 	ospd? ( >=net-analyzer/ospd-1.3.2[extras?] )"
 
 pkg_postinst() {

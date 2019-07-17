@@ -15,7 +15,7 @@ HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	 https://github.com/greenbone/${MY_PN}/releases/download/v${PV}/${MY_PN}-${MY_NODE_N}-${PV}.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
 
-SLOT="0"
+SLOT="1"
 LICENSE="GPL-2+"
 KEYWORDS="~amd64 ~x86"
 IUSE="extras"
@@ -32,8 +32,8 @@ DEPEND="
 
 RDEPEND="
 	${DEPEND}
-	!=net-analyzer/greenbone-security-assistant-7.0*
-	>=net-analyzer/openvas-scanner-6.0.0
+	!net-analyzer/greenbone-security-assistant:0
+	>=net-analyzer/openvas-scanner-6.0.1:1
 	>=net-analyzer/gvmd-8.0.0"
 
 BDEPEND="

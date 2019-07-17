@@ -12,7 +12,7 @@ DESCRIPTION="Open Vulnerability Assessment Scanner"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/openvas-scanner/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
-SLOT="0"
+SLOT="1"
 LICENSE="GPL-2 GPL-2+"
 KEYWORDS="~amd64 ~x86"
 IUSE="cron extras"

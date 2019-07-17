@@ -10,7 +10,7 @@ MY_PN="gsa"
 MY_DN="gsad"
 MY_NODE_N="node_modules"
 
-DESCRIPTION="Greenbone security assistant"
+DESCRIPTION="Greenbone Security Assistant"
 HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	 https://github.com/greenbone/${MY_PN}/releases/download/v${PV}/${MY_PN}-${MY_NODE_N}-${PV}.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"

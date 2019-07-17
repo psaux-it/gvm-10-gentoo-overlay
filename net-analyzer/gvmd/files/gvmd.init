@@ -5,7 +5,7 @@
 name="Greenbone Vulnerability Manager"
 command=/usr/sbin/gvmd
 command_args="${GVMD_OPTIONS} ${GVMD_PORT} ${GVMD_LISTEN_ADDRESS} ${GVMD_SCANNER_HOST} ${GVMD_GNUTLS_PRIORITIES}"
-pidfile="/var/run/gvmd.pid"
+pidfile="/run/gvmd.pid"
 command_background="true"
 
 depend() {

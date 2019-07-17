@@ -50,8 +50,6 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 PATCHES=(
 	# Musl fix.
 	"${FILESDIR}/${P}-execinfo-musl-fix.patch"
-	# Revision 6.0.1 | upstream #296 #301 #308 #312 #321 #330
-	"${FILESDIR}/${P}-cumulative.patch"
 	# GLIBC malloc-trim patch.
 	"${FILESDIR}/${P}-malloc-trim.patch"
 )

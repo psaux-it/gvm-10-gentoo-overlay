@@ -55,8 +55,6 @@ PATCHES=(
 	"${FILESDIR}/${P}-yarn-install.patch"
 	# Fix react-env path.
 	"${FILESDIR}/${P}-react-env.patch"
-	# Remove yarn terminal output.
-	"${FILESDIR}/${P}-command.patch"
 )
 
 src_prepare() {

@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenVAS Manager
+Description=Greenbone Vulnerability Manager
 After=network.target
 After=openvas-scanner.service
 Wants=openvas-scanner.service
@@ -9,11 +9,8 @@ Before=gsa.service
 Type=forking
 EnvironmentFile=-/etc/gvm/sysconfig/gvmd-daemon.conf
 ExecStart=/usr/sbin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES 
-ExecReload=/bin/kill -HUP $MAINPID
-KillMode=mixed
-User=root
-Group=root
-TimeoutSec=1200
+Restart=always
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target

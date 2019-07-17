@@ -3,7 +3,7 @@ Description=Greenbone Vulnerability Manager
 After=network.target
 After=openvas-scanner.service
 Wants=openvas-scanner.service
-Before=gsa.service
+Before=gsad.service
 
 [Service]
 Type=forking

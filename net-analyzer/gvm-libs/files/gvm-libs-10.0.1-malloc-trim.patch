@@ -1,6 +1,6 @@
---- a/base/hosts.c
-+++ b/base/hosts.c
-@@ -1013,7 +1013,9 @@ gvm_hosts_deduplicate (gvm_hosts_t *hosts)
+--- a/base/hosts.c	2019-07-17 12:28:39.000000000 +0300
++++ b/base/hosts.c	2019-07-17 21:20:26.299147597 +0300
+@@ -1013,7 +1013,9 @@
    hosts->count -= duplicates;
    hosts->removed += duplicates;
    hosts->current = 0;
@@ -10,7 +10,7 @@
  }
  
  /**
-@@ -1208,7 +1210,9 @@ gvm_hosts_new_with_max (const gchar *hosts_str, unsigned int max_hosts)
+@@ -1208,7 +1210,9 @@
      gvm_hosts_deduplicate (hosts);
  
    g_strfreev (split);

@@ -7,6 +7,7 @@ CMAKE_MAKEFILE_GENERATOR="emake"
 inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 MY_PN="gsa"
+MY_DN="gsad"
 MY_NODE_N="node_modules"
 
 DESCRIPTION="Greenbone security assistant"
@@ -45,7 +46,7 @@ BDEPEND="
 
 BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
 S="${WORKDIR}/${MY_PN}-${PV}"
-MY_NODE_DIR="${S}/gsa/"
+MY_NODE_DIR="${S}/${MY_PN}/"
 
 PATCHES=(
 	# QA fix for 8.0.0.
@@ -65,7 +66,7 @@ src_prepare() {
 	# We will use pre-fetched node_modules.
 	mv "${WORKDIR}/${MY_NODE_N}" "${MY_NODE_DIR}" || die "couldn't move node_modules"
 	# Update .yarnrc accordingly.
-	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}"/gsa/.yarnrc || die "echo failed"
+	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}/${MY_PN}/.yarnrc" || die "echo failed"
 	# QA-Fix | Remove doxygen warnings for !CLANG.
 	if use extras; then
 		if ! tc-is-clang; then
@@ -97,7 +98,7 @@ src_compile() {
 	if use extras; then
 		cmake-utils_src_make -C "${BUILD_DIR}" doc
 		cmake-utils_src_make doc-full -C "${BUILD_DIR}" doc
-		HTML_DOCS=( "${BUILD_DIR}"/gsad/doc/generated/html/. )
+		HTML_DOCS=( "${BUILD_DIR}/${MY_DN}/doc/generated/html/." )
 	fi
 	cmake-utils_src_make rebuild_cache
 }
@@ -106,17 +107,17 @@ src_install() {
 	cmake-utils_src_install
 
 	insinto /etc/gvm/sysconfig
-	doins "${FILESDIR}/${MY_PN}-daemon.conf"
+	doins "${FILESDIR}/${MY_DN}-daemon.conf"
 
 	insinto /etc/gvm/reverse-proxy
-	doins "${FILESDIR}"/gsa.nginx.reverse.proxy.example
+	doins "${FILESDIR}/${MY_DN}.nginx.reverse.proxy.example"
 
-	newinitd "${FILESDIR}/${MY_PN}.init" "${MY_PN}"
-	newconfd "${FILESDIR}/${MY_PN}-daemon.conf" "${MY_PN}"
+	newinitd "${FILESDIR}/${MY_DN}.init" "${MY_DN}"
+	newconfd "${FILESDIR}/${MY_DN}-daemon.conf" "${MY_DN}"
 
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${MY_PN}.logrotate" "${MY_PN}"
+	newins "${FILESDIR}/${MY_DN}.logrotate" "${MY_DN}"
 
-	systemd_newtmpfilesd "${FILESDIR}/${MY_PN}.tmpfiles.d" "${MY_PN}".conf
-	systemd_dounit "${FILESDIR}/${MY_PN}.service"
+	systemd_newtmpfilesd "${FILESDIR}/${MY_DN}.tmpfiles.d" "${MY_DN}".conf
+	systemd_dounit "${FILESDIR}/${MY_DN}.service"
 }

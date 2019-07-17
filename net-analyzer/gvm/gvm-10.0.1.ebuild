@@ -15,12 +15,12 @@ IUSE="cli +cron +extras +gsa ldap +ospd postgres radius +sqlite"
 REQUIRED_USE="|| ( postgres sqlite )"
 
 RDEPEND="
-	>=net-analyzer/gvm-libs-10.0.0[extras?,ldap?,radius?]
-	>=net-analyzer/gvmd-8.0.0[extras?,postgres?,sqlite?]
-	>=net-analyzer/openvas-scanner-6.0.0[cron?,extras?]
+	>=net-analyzer/gvm-libs-10.0.1[extras?,ldap?,radius?]
+	>=net-analyzer/gvmd-8.0.1[extras?,postgres?,sqlite?]
+	>=net-analyzer/openvas-scanner-6.0.1[cron?,extras?]
 	!net-analyzer/openvas
 	cli? ( >=net-analyzer/gvm-tools-1.4.1 )
-	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.0[extras?] )
+	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.1[extras?] )
 	ospd? ( >=net-analyzer/ospd-1.3.2[extras?] )"
 
 pkg_postinst() {

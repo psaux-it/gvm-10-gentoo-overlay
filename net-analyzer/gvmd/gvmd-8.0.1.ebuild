@@ -101,4 +101,5 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	keepdir /var/lib/gvm/gvmd
+	keepdir /etc/gvm/{gvmd_log.conf,pwpolicy.conf}
 }

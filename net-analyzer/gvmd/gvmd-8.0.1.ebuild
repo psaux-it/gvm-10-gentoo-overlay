@@ -92,6 +92,12 @@ src_install() {
 	insinto /etc/gvm/sysconfig
 	doins "${FILESDIR}/${PN}-daemon.conf"
 
+	for f in "${FILESDIR}"/*sync.conf
+	do
+		insinto /etc/gvm
+		doins "${FILESDIR}/${f}"
+	done
+
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 

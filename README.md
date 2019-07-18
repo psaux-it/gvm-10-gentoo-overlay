@@ -49,8 +49,33 @@ ospd                         --> not changed
 
 ## Major Changes in GVM-10
 
-Huge improvement in WEBUI (greenbone-security-assistant), lots of bug fixing in all components. Greenbone security assistant is completely rewritten in react.
+Huge improvement in WEBUI (greenbone-security-assistant), lots of bug fixing in all components. Greenbone security assistant is completely rewritten in react.Before starting gvmd 8.0 for the first time you need to move some files to the new locations where they are expected now. If you do not do this, the files are freshly initialized and it gets more complicated to transfer the old data properly.
 
+### GVMD-Migrating to Version 8.0
+
+    move $prefix/etc/openvas/pwpolicy.conf to $prefix/etc/gvm/
+    move $prefix/etc/openvas/openvasmd_log.conf to $prefix/etc/gvm/gvmd_log.conf
+    copy $prefix/etc/openvas/gsf-access-key to $prefix/etc/gvm/ 
+    move $prefix/var/lib/openvas/scap-data to $prefix/var/lib/gvm/scap-data
+    move $prefix/var/lib/openvas/cert-data to $prefix/var/lib/gvm/cert-data
+    move $prefix/var/lib/openvas/openvasmd to $prefix/var/lib/gvm/gvmd
+    move $prefix/var/lib/openvas/CA to $prefix/var/lib/gvm/CA
+    move $prefix/var/lib/openvas/private to $prefix/var/lib/gvm/private
+
+### (SQLite backend only)
+
+    move $prefix/var/lib/openvas/mgr/tasks.db to $prefix/var/lib/gvm/gvmd/gvmd.db
+
+### (Postgres backend only) rename database to gvmd:
+
+    sudo -u postgres sh
+    psql --command='ALTER DATABASE tasks RENAME TO gvmd;'
+
+### Migrating the Database
+
+If you have used Manager before, you might need to migrate the database to the current data model. Use this command to run the migration:
+
+    gvmd --migrate
 
 ## What is GVM (previously named OpenVAS)
 

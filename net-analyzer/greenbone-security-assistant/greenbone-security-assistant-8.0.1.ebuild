@@ -53,8 +53,12 @@ PATCHES=(
 	"${FILESDIR}/${P}-pid.patch"
 	# Disable yarn-fetch during compile.
 	"${FILESDIR}/${P}-yarn-install.patch"
-	# Fix react-env path.
+	# Fix react-env path to find react.js.
 	"${FILESDIR}/${P}-react-env.patch"
+	# Remove ugly uninstall-snippet that causes failing re-emerge.
+	"${FILESDIR}/${P}-uninstall-snippet.patch"
+	# Remove unnecessary install paths.
+        "${FILESDIR}/${P}-config.patch"
 )
 
 src_prepare() {

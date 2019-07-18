@@ -5,7 +5,7 @@
  
  if (NOT GVM_PID_DIR)
 -  set (GVM_PID_DIR "${LOCALSTATEDIR}/run")
-+  set (GVM_PID_DIR "/run")
++  set (GVM_PID_DIR "/var/lib/gvm")
  endif (NOT GVM_PID_DIR)
  
  if (NOT GVM_SYSCONF_DIR)

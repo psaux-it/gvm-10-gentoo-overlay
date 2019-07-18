@@ -119,4 +119,6 @@ src_install() {
 	newins "${FILESDIR}/${MY_DN}.logrotate" "${MY_DN}"
 
 	systemd_dounit "${FILESDIR}/${MY_DN}.service"
+
+	keepdir /var/lib/gvm
 }

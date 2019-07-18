@@ -120,6 +120,7 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
+	keepdir /var/lib/gvm
 	keepdir /var/lib/openvas/{gnupg,plugins}
-	keepdir /var/log/gvm
+	keepdir /var/log/{gvm,openvas}
 }

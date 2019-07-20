@@ -52,30 +52,31 @@ PATCHES=(
 	# QA fix for 8.0.0.
 	"${FILESDIR}/${P}-pid.patch"
 	# Disable yarn-fetch during compile.
-	"${FILESDIR}/${P}-yarn-install.patch"
-	# Fix react-env path to find react.js.
-	"${FILESDIR}/${P}-react-env.patch"
+	"${FILESDIR}/${P}-node.patch"
+	# Fix react-env path for react.js.
+	"${FILESDIR}/${P}-reactjs.patch"
 	# Remove ugly uninstall-snippet that causes failing re-emerge.
 	"${FILESDIR}/${P}-uninstall-snippet.patch"
 	# Remove unnecessary install paths.
-        "${FILESDIR}/${P}-config.patch"
+        "${FILESDIR}/${P}-cmakelist.patch"
 )
 
 src_prepare() {
 	cmake-utils_src_prepare
-	# We will use pre-fetched node_modules.
+	# We will use pre-generated npm stuff.
 	mv "${WORKDIR}/${MY_NODE_N}" "${MY_NODE_DIR}" || die "couldn't move node_modules"
 	# Update .yarnrc accordingly.
 	echo "--modules-folder ${MY_NODE_DIR}" >> "${S}/${MY_PN}/.yarnrc" || die "echo failed"
-	# QA-Fix | Remove doxygen warnings for !CLANG.
+	# QA-Fix | Remove !CLANG doxygen warnings for 8.0.1
 	if use extras; then
 		if ! tc-is-clang; then
+		   local f
 		   for f in gsad/doc/*.in
 		   do
-			sed \
-			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
-			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
-			-i "${f}" || die "couldn't disable CLANG parsing"
+			sed -i \
+				-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+				-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+				"${f}" || die "couldn't disable CLANG parsing"
 		   done
 		fi
 	fi

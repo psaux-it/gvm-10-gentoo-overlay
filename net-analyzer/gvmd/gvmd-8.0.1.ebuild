@@ -101,5 +101,5 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	keepdir /etc/gvm
-	keepdir /var/lib/gvm
+	keepdir /var/lib/gvm/gvmd
 }

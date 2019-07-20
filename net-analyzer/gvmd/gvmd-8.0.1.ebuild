@@ -67,7 +67,7 @@ src_configure() {
 		"-DLOCALSTATEDIR=${EPREFIX}/var"
 		"-DSYSCONFDIR=${EPREFIX}/etc"
 	)
-	# Add release hardening flags for 8.0.0
+	# Add release hardening flags for 8.0.1
 	append-cflags -Wno-nonnull -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -fstack-protector
 	append-ldflags -Wl,-z,relro -Wl,-z,now
 	cmake-utils_src_configure

@@ -89,11 +89,8 @@ src_install() {
 	insinto /etc/gvm/sysconfig
 	doins "${FILESDIR}/${PN}-daemon.conf"
 
-	for f in "${FILESDIR}"/*sync.conf
-	do
-		insinto /etc/gvm
-		doins "${FILESDIR}/${f}"
-	done
+	insinto /etc/gvm
+	doins -r "${FILESDIR}"/*sync*
 
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
@@ -103,6 +100,6 @@ src_install() {
 
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
-	keepdir /etc/gvm/{gvmd_log.conf,pwpolicy.conf,gsf-access-key}
+	keepdir /etc/gvm
 	keepdir /var/lib/gvm
 }

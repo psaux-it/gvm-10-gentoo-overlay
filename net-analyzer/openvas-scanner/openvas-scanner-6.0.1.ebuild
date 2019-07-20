@@ -50,9 +50,9 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 
 src_prepare() {
 	cmake-utils_src_prepare
-	# QA-Fix | Correct FHS/Gentoo policy paths for 6.0.0
+	# QA-Fix | Correct FHS/Gentoo policy paths for 6.0.1
 	sed -i -e "s*/doc/openvas-scanner/*/doc/openvas-scanner-${PV}/*g" "$S"/src/CMakeLists.txt || die
-	# QA-Fix | Remove doxygen warnings for !CLANG.
+	# QA-Fix | Remove !CLANG doxygen warnings for 6.0.1
 	if use extras; then
 		if ! tc-is-clang; then
 		   local f

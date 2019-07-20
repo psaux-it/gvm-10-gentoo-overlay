@@ -68,7 +68,7 @@ src_configure() {
 		$(usex ldap -DBUILD_WITHOUT_LDAP=0 -DBUILD_WITHOUT_LDAP=1)
 		$(usex radius -DBUILD_WITHOUT_RADIUS=0 -DBUILD_WITHOUT_RADIUS=1)
 	)
-	# Add release hardening flags for 10.0.0
+	# Add release hardening flags for 10.0.1
 	append-cflags -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -fstack-protector
 	append-ldflags -Wl,-z,relro -Wl,-z,now
 	cmake-utils_src_configure

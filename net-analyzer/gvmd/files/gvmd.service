@@ -9,9 +9,10 @@ Before=gsad.service
 Type=forking
 EnvironmentFile=-/etc/gvm/sysconfig/gvmd-daemon.conf
 ExecStart=/usr/sbin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES 
+User=gvm
+Group=gvm
 Restart=on-failure
 RestartSec=12
-TimeoutSec=1200
 
 [Install]
 WantedBy=multi-user.target

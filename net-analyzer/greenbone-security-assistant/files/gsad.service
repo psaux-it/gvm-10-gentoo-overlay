@@ -9,9 +9,10 @@ Wants=gvmd.service
 Type=forking
 EnvironmentFile=-/etc/gvm/sysconfig/gsad-daemon.conf
 ExecStart=/usr/sbin/gsad $GSAD_OPTIONS $GSAD_LISTEN_ADDRESS $GSAD_LISTEN_PORT $GSAD_MANAGER_LISTEN_ADDRESS $GSAD_MANAGER_LISTEN_PORT $GSAD_GNUTLS_PRIORITIES $GSAD_REVERSE_PROXY
-Restart=on-failure
-RestartSec=20
-TimeoutSec=1200
+User=gvm
+Group=gvm
+Restart=always
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

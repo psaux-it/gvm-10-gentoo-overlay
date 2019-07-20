@@ -41,24 +41,20 @@ BDEPEND="
 		  dev-perl/SQL-Translator
 	)"
 
-PATCHES=(
-	# GLIBC malloc-trim patch.
-	"${FILESDIR}/${P}-malloc-trim.patch"
-	# Fix pid dir.
-	"${FILESDIR}/${P}-pid.patch"
-)
+PATCHES=( "${FILESDIR}/${P}-pid.patch" )
 
 src_prepare() {
 	cmake-utils_src_prepare
 	# QA-Fix | Remove doxygen warnings for !CLANG
 	if use extras; then
 		if ! tc-is-clang; then
+		   local f
 		   for f in doc/*.in
 		   do
-			sed \
-			-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
-			-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
-			-i "${f}" || die "couldn't disable CLANG parsing"
+			sed -i \
+				-e "s*CLANG_ASSISTED_PARSING = NO*#CLANG_ASSISTED_PARSING = NO*g" \
+				-e "s*CLANG_OPTIONS*#CLANG_OPTIONS*g" \
+				"${f}" || die "couldn't disable CLANG parsing"
 		   done
 		fi
 	fi

@@ -7,10 +7,13 @@ Wants=gvmd.service
 
 [Service]
 Type=forking
-EnvironmentFile=-/etc/gvm/sysconfig/gsad-daemon.conf
-ExecStart=/usr/sbin/gsad $GSAD_OPTIONS $GSAD_LISTEN_ADDRESS $GSAD_LISTEN_PORT $GSAD_MANAGER_LISTEN_ADDRESS $GSAD_MANAGER_LISTEN_PORT $GSAD_GNUTLS_PRIORITIES $GSAD_REVERSE_PROXY
 User=gvm
 Group=gvm
+EnvironmentFile=-/etc/gvm/sysconfig/gsad-daemon.conf
+PermissionsStartOnly=true
+ExecStartPre=-/bin/touch /var/log/gvm/gsad.log
+ExecStartPre=-/bin/chown gvm.gvm /var/log/gvm/gsad.log
+ExecStart=/usr/sbin/gsad $GSAD_OPTIONS $GSAD_LISTEN_ADDRESS $GSAD_LISTEN_PORT $GSAD_MANAGER_LISTEN_ADDRESS $GSAD_MANAGER_LISTEN_PORT $GSAD_GNUTLS_PRIORITIES $GSAD_REVERSE_PROXY
 Restart=always
 RestartSec=10
 

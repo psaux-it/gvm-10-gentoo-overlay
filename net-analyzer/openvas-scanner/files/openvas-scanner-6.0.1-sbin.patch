@@ -1,5 +1,5 @@
---- a/src/CMakeLists.txt	2019-07-17 13:42:16.000000000 +0300
-+++ b/src/CMakeLists.txt	2019-07-21 22:15:41.431901137 +0300
+--- a/src/CMakeLists.txt	2019-07-21 23:16:18.608251465 +0300
++++ b/src/CMakeLists.txt	2019-07-21 23:17:08.434210058 +0300
 @@ -175,7 +175,7 @@
  ## Install
  
@@ -18,3 +18,4 @@
           PERMISSIONS OWNER_EXECUTE OWNER_READ OWNER_WRITE
                       GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
  
+

@@ -112,6 +112,7 @@ src_install() {
 
 	insinto /etc/gvm/reverse-proxy
 	doins "${FILESDIR}/${MY_DN}.nginx.reverse.proxy.example"
+	fowners -R gvm:gvm /etc/gvm
 
 	newinitd "${FILESDIR}/${MY_DN}.init" "${MY_DN}"
 	newconfd "${FILESDIR}/${MY_DN}-daemon.conf" "${MY_DN}"

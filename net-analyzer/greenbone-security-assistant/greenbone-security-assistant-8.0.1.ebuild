@@ -59,6 +59,8 @@ PATCHES=(
 	"${FILESDIR}/${P}-uninstall-snippet.patch"
 	# Remove unnecessary install paths.
         "${FILESDIR}/${P}-cmakelist.patch"
+	# Security patch for 8.0.1.
+        "${FILESDIR}/${P}-sbin.patch"
 )
 
 src_prepare() {

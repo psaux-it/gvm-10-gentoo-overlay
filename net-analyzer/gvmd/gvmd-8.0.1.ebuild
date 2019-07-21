@@ -86,11 +86,13 @@ src_compile() {
 src_install() {
 	cmake-utils_src_install
 
-	insinto /etc/gvm/sysconfig
-	doins "${FILESDIR}/${PN}-daemon.conf"
-
+	dodir /etc/gvm
 	insinto /etc/gvm
 	doins -r "${FILESDIR}"/*sync*
+
+	dodir /etc/gvm/sysconfig
+	insinto /etc/gvm/sysconfig
+	doins "${FILESDIR}/${PN}-daemon.conf"
 
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
@@ -101,9 +103,8 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	keepdir /etc/gvm
+	fowners -R gvm:gvm /etc/gvm
 	keepdir /var/lib/gvm/gvmd
 	fowners -R gvm:gvm /var/lib/gvm
 	fperms 0755 /var/lib/gvm
-	fowners -R gvm:gvm /etc/gvm
-	fowners -R gvm:gvm /var/log/gvm
 }

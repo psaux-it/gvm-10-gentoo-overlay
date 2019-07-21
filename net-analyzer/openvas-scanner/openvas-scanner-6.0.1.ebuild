@@ -97,9 +97,11 @@ src_compile() {
 src_install() {
 	cmake-utils_src_install
 
+	dodir /etc/openvas
 	insinto /etc/openvas
 	doins "${FILESDIR}"/openvassd.conf "${FILESDIR}"/redis.conf.example
 
+	dodir /etc/openvas/sysconfig
 	insinto /etc/openvas/sysconfig
 	doins "${FILESDIR}/${PN}-daemon.conf"
 
@@ -113,6 +115,7 @@ src_install() {
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 
+	dodir /etc/logrotate.d
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 
@@ -122,7 +125,8 @@ src_install() {
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	fowners -R gvm:gvm /var/lib/openvas
 	fperms 0755 /var/lib/openvas
-	keepdir /var/log/openvas
-	fowners -R gvm:gvm /var/log/openvas
+	keepdir /var/log/{gvm,openvas}
+	fowners -R gvm:gvm /var/log/{gvm,openvas}
+	keepdir /etc/openvas
 	fowners -R gvm:gvm /etc/openvas
 }

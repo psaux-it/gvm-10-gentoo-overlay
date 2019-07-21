@@ -41,6 +41,11 @@ BDEPEND="
 		  dev-libs/libxslt
 	)"
 
+PATCHES=(
+	# Security fix for 6.0.1.
+	"${FILESDIR}/${P}-sbin.patch"
+)
+
 src_prepare() {
 	cmake-utils_src_prepare
 	# QA-Fix | Use correct FHS/Gentoo policy paths for 8.0.1

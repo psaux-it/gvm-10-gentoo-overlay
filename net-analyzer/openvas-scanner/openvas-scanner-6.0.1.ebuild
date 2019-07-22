@@ -52,7 +52,7 @@ PATCHES=( "${FILESDIR}/${P}-sbin.patch" )
 
 pkg_setup() {
 	enewgroup gvm
-	enewuser gvm -1 /bin/bash /var/lib/gvm gvm
+	enewuser gvm 1453 /bin/bash /var/lib/gvm gvm
 }
 
 src_prepare() {

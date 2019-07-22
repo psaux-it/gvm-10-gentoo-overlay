@@ -8,7 +8,7 @@
 
 name="Greenbone Vulnerability Manager"
 command=/usr/bin/gvmd
-command_args="${GVMD_OPTIONS} ${GVMD_LISTEN_ADDRESS_UNIX} ${GVMD_LISTEN_ADDRESS_TCP} ${GVMD_PORT} ${GVMD_LISTEN_OWNER} ${GVMD_LISTEN_GROUP} ${GVMD_LISTEN_MODE} ${GVMD_SCANNER_HOST} ${GVMD_GNUTLS_PRIORITIES}"
+command_args="${GVMD_OPTIONS} ${GVMD_LISTEN_ADDRESS_TCP} ${GVMD_PORT} ${GVMD_SCANNER_HOST} ${GVMD_GNUTLS_PRIORITIES}"
 command_background="true"
 command_user="${GVMD_USER}:${GVMD_GROUP}"
 pidfile="/run/gvmd.pid"

@@ -1,5 +1,5 @@
 #!/sbin/openrc-run
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 : ${GVMD_USER:=gvm}
@@ -20,5 +20,6 @@ depend() {
 }
 
 start_pre() {
+	/bin/bash /etc/gvm/gvmd-startpre.sh
 	checkpath --directory --mode 0775 --quiet /var/cache/openvas
 }

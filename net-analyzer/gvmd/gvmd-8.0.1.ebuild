@@ -100,7 +100,7 @@ src_install() {
 	doins "${FILESDIR}/${PN}-daemon.conf"
 
 	exeinto /etc/gvm
-	doexe "${FILESDIR}"/gvmd-systemd.sh
+	doexe "${FILESDIR}"/gvmd-startpre.sh
 
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"

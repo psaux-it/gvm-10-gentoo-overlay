@@ -13,7 +13,7 @@ Group=gvm
 PermissionsStartOnly=true
 EnvironmentFile=-/etc/gvm/sysconfig/gvmd-daemon.conf
 ExecStartPre=-/etc/gvm/gvmd-systemd.sh
-ExecStart=/usr/bin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES
+ExecStart=/usr/bin/gvmd $GVMD_OPTIONS $GVMD_LISTEN_ADDRESS_UNIX $GVMD_LISTEN_ADDRESS_TCP $GVMD_PORT $GVMD_LISTEN_OWNER $GVMD_LISTEN_GROUP $GVMD_LISTEN_MODE $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES
 Restart=on-failure
 RestartSec=10
 

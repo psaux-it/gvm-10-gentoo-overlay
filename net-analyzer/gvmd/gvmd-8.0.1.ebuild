@@ -109,7 +109,6 @@ src_install() {
 
 	keepdir /etc/gvm
 	fowners -R gvm:gvm /etc/gvm
-	keepdir /var/lib/gvm/gvmd
-	fowners -R gvm:gvm /var/lib/gvm
-	fperms 0755 /var/lib/gvm
+	keepdir /var/lib/gvm/{gnupg,gvmd}
+	fowners gvm:gvm /var/lib/gvm/{gnupg,gvmd}
 }

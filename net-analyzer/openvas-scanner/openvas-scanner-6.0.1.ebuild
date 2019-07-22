@@ -56,7 +56,7 @@ PATCHES=(
 
 pkg_setup() {
 	enewgroup gvm
-	enewuser gvm -1 /bin/bash /dev/null gvm
+	enewuser gvm 1453 /bin/bash /var/lib/gvm gvm,redis
 }
 
 src_prepare() {
@@ -128,11 +128,11 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
+	keepdir /var/lib/openvas
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	fowners -R gvm:gvm /var/lib/openvas
-	fperms 0755 /var/lib/openvas
-	keepdir /var/log/{gvm,openvas}
-	fowners -R gvm:gvm /var/log/{gvm,openvas}
+	keepdir /var/log/gvm
+	fowners -R gvm:gvm /var/log/gvm
 	keepdir /etc/openvas
 	fowners -R gvm:gvm /etc/openvas
 }

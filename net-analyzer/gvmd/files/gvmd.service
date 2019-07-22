@@ -7,12 +7,15 @@ Before=gsad.service
 
 [Service]
 Type=forking
+PrivateTmp=yes
 User=gvm
 Group=gvm
+PermissionsStartOnly=true
 EnvironmentFile=-/etc/gvm/sysconfig/gvmd-daemon.conf
-ExecStart=/usr/bin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES 
+ExecStartPre=-/etc/gvm/gvmd-systemd.sh
+ExecStart=/usr/bin/gvmd $GVMD_OPTIONS $GVMD_PORT $GVMD_LISTEN_ADDRESS $GVMD_SCANNER_HOST $GVMD_GNUTLS_PRIORITIES
 Restart=on-failure
-RestartSec=12
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

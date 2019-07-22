@@ -109,9 +109,11 @@ src_install() {
 
 	if use cron; then
 		# Install the cron job if they want it.
-		exeinto /etc/cron.daily
-		newexe "${FILESDIR}/gvm-feed-sync.cron" \
-		gvm-feed-sync
+		exeinto /etc/gvm
+		doexe "${FILESDIR}/gvm-feed-sync.sh"
+
+		insinto /etc/cron.d
+		newins "${FILESDIR}"/gvm-feed-sync.cron gvm
 	fi
 
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"

@@ -48,9 +48,9 @@ src_prepare() {
 	# QA-Fix | Use correct FHS/Gentoo policy paths for 8.0.1
 	sed -i -e "s*share/doc/gvm/html/*share/doc/gvmd-${PV}/html/*g" "$S"/doc/CMakeLists.txt || die
 	sed -i -e "s*/doc/gvm/*/doc/gvmd-${PV}/*g" "$S"/CMakeLists.txt || die
-	# Fix permission erros.
-	sed -i -e "s*$LOCK_FILE*/dev/null*g" "$S/tools/greenbone-certdata-sync.in" || die
-	sed -i -e "s*$LOCK_FILE*/dev/null*g" "$S/tools/greenbone-scapdata-sync.in" || die
+	# Fix permission erros for 8.0.1.
+	sed -i -e 's/$LOCK_FILE//g' "$S/tools/greenbone-certdata-sync.in" || die
+	sed -i -e 's/$LOCK_FILE//g' "$S/tools/greenbone-scapdata-sync.in" || die
 	# QA-Fix | Remove !CLANG Doxygen warnings for 8.0.1
 	if use extras; then
 		if ! tc-is-clang; then

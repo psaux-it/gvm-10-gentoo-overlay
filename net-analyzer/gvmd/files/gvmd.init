@@ -2,11 +2,17 @@
 # Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+: ${GVMD_USER:=gvm}
+: ${GVMD_GROUP:=gvm}
+: ${GVMD_TIMEOUT:=30}
+
 name="Greenbone Vulnerability Manager"
-command=/usr/sbin/gvmd
+command=/usr/bin/gvmd
 command_args="${GVMD_OPTIONS} ${GVMD_PORT} ${GVMD_LISTEN_ADDRESS} ${GVMD_SCANNER_HOST} ${GVMD_GNUTLS_PRIORITIES}"
-pidfile="/run/gvmd.pid"
 command_background="true"
+command_user="${GVMD_USER}:${GVMD_GROUP}"
+pidfile="/run/gvmd.pid"
+retry="${GVMD_TIMEOUT}"
 
 depend() {
 	after bootmisc

@@ -128,9 +128,8 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
-	dodir /var/lib/gvm
-	keepdir /var/{lib,log}/gvm
-	fowners gvm:gvm /var/{lib,log}/gvm
+	keepdir /var/log/gvm
+	fowners gvm:gvm /var/log/gvm
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	fowners -R gvm:gvm /var/lib/openvas
 }

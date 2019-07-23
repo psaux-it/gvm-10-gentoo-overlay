@@ -90,6 +90,6 @@ src_install() {
 	insinto /usr/share/gvm
 	doins "${FILESDIR}"/GVM.gentoo
 
-	keepdir /var/lib/gvm/gnupg
-	keepdir /var/log/gvm
+	keepdir /var/lib/gvm
+	fowners -R gvm:gvm /var/lib/gvm
 }

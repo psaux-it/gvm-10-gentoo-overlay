@@ -104,6 +104,8 @@ src_install() {
 	exeinto /etc/gvm
 	doexe "${FILESDIR}"/gvmd-startpre.sh
 
+	fowners -R gvm:gvm /etc/gvm
+
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 
@@ -112,8 +114,8 @@ src_install() {
 
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
-	keepdir /etc/gvm
-	fowners -R gvm:gvm /etc/gvm
+	dodir /var/log/gvm
+	fowners gvm:gvm /var/log/gvm
 	keepdir /var/lib/gvm/{gnupg,gvmd}
-	fowners gvm:gvm /var/lib/gvm/{gnupg,gvmd}
+	fowners -R gvm:gvm /var/lib/gvm
 }

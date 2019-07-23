@@ -116,6 +116,8 @@ src_install() {
 		newins "${FILESDIR}"/gvm-feed-sync.cron gvm
 	fi
 
+	fowners -R gvm:gvm /etc/openvas
+
 	newinitd "${FILESDIR}/${PN}.init" "${PN}"
 	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
 
@@ -126,11 +128,8 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
-	keepdir /var/lib/{gvm,openvas}
+	dodir /var/lib/gvm
+	fowners gvm:gvm /var/lib/gvm
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	fowners -R gvm:gvm /var/lib/openvas
-	keepdir /var/log/gvm
-	fowners -R gvm:gvm /var/log/gvm
-	keepdir /etc/openvas
-	fowners -R gvm:gvm /etc/openvas
 }

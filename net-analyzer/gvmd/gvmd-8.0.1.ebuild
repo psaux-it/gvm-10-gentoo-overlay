@@ -114,6 +114,7 @@ src_install() {
 
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
+	# Set proper permissions on required files/directories
 	keepdir /var/lib/gvm/gvmd
 	fowners -R gvm:gvm /var/lib/gvm
 }

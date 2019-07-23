@@ -90,6 +90,7 @@ src_install() {
 	insinto /usr/share/gvm
 	doins "${FILESDIR}"/GVM.gentoo
 
+	# Set proper permissions on required files/directories
 	keepdir /var/lib/gvm
 	fowners -R gvm:gvm /var/lib/gvm
 }

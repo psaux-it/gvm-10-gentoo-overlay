@@ -23,12 +23,9 @@ IUSE="extras"
 DEPEND="
 	dev-libs/libgcrypt:0=
 	dev-libs/libxslt
-	dev-python/polib
 	>=net-analyzer/gvm-libs-10.0.1
 	net-libs/gnutls:=
-	net-libs/libmicrohttpd[messages]
-	>=net-libs/nodejs-8.12.0
-	>=sys-apps/yarn-1.15.2"
+	net-libs/libmicrohttpd[messages]"
 
 RDEPEND="
 	${DEPEND}
@@ -37,10 +34,13 @@ RDEPEND="
 	>=net-analyzer/gvmd-8.0.0"
 
 BDEPEND="
+	>=net-libs/nodejs-8.12.0
+        >=sys-apps/yarn-1.15.2
 	virtual/pkgconfig
 	extras? ( app-doc/doxygen[dot]
 		  app-doc/xmltoman
 		  app-text/htmldoc
+		  dev-python/polib
 		  sys-devel/gettext
 	)"
 
@@ -57,9 +57,9 @@ PATCHES=(
 	"${FILESDIR}/${P}-reactjs.patch"
 	# Remove ugly uninstall-snippet that causes failing re-emerge.
 	"${FILESDIR}/${P}-uninstall-snippet.patch"
-	# Remove unnecessary install paths.
+	# Remove unnecessary install paths/files.
         "${FILESDIR}/${P}-cmakelist.patch"
-	# Security patch for 8.0.1.
+	# Install to /usr/bin instead of /usr/sbin
         "${FILESDIR}/${P}-sbin.patch"
 )
 

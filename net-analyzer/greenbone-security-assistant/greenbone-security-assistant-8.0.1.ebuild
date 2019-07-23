@@ -31,7 +31,7 @@ RDEPEND="
 	${DEPEND}
 	!net-analyzer/greenbone-security-assistant:0
 	>=net-analyzer/openvas-scanner-6.0.1:1
-	>=net-analyzer/gvmd-8.0.0"
+	>=net-analyzer/gvmd-8.0.1"
 
 BDEPEND="
 	>=net-libs/nodejs-8.12.0

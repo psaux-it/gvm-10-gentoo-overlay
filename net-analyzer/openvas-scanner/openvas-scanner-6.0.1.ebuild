@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils flag-o-matic systemd toolchain-funcs user
+inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 MY_PN="openvas"
 
@@ -49,11 +49,6 @@ BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
 S="${WORKDIR}/${MY_PN}-${PV}"
 
 PATCHES=( "${FILESDIR}/${P}-sbin.patch" )
-
-pkg_setup() {
-	enewgroup gvm
-	enewuser gvm 1453 /bin/bash /var/lib/gvm gvm
-}
 
 src_prepare() {
 	cmake-utils_src_prepare
@@ -128,6 +123,7 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}/${PN}.tmpfiles.d" "${PN}".conf
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
+	# Set proper permissions on required files/directories
 	keepdir /var/log/gvm
 	fowners gvm:gvm /var/log/gvm
 	keepdir /var/lib/openvas/{gnupg,plugins}

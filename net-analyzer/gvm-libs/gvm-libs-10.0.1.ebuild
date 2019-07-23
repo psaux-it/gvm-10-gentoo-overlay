@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_MAKEFILE_GENERATOR="emake"
-inherit cmake-utils flag-o-matic toolchain-funcs
+inherit cmake-utils flag-o-matic toolchain-funcs user
 
 DESCRIPTION="Greenbone vulnerability management libraries, previously named openvas-libraries"
 HOMEPAGE="https://www.greenbone.net/en/"
@@ -42,6 +42,11 @@ BDEPEND="
 	)"
 
 PATCHES=( "${FILESDIR}/${P}-pid.patch" )
+
+pkg_setup() {
+	enewgroup gvm
+	enewuser gvm 1453 /bin/bash /var/lib/gvm gvm
+}
 
 src_prepare() {
 	cmake-utils_src_prepare

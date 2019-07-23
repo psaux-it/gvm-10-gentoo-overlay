@@ -129,7 +129,8 @@ src_install() {
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
 	dodir /var/lib/gvm
-	fowners gvm:gvm /var/lib/gvm
+	keepdir /var/{lib,log}/gvm
+	fowners gvm:gvm /var/{lib,log}/gvm
 	keepdir /var/lib/openvas/{gnupg,plugins}
 	fowners -R gvm:gvm /var/lib/openvas
 }

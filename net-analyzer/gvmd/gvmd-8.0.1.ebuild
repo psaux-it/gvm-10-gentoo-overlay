@@ -114,8 +114,6 @@ src_install() {
 
 	systemd_dounit "${FILESDIR}/${PN}.service"
 
-	dodir /var/log/gvm
-	fowners gvm:gvm /var/log/gvm
-	keepdir /var/lib/gvm/{gnupg,gvmd}
+	keepdir /var/lib/gvm/gvmd
 	fowners -R gvm:gvm /var/lib/gvm
 }

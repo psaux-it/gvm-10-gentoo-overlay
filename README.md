@@ -36,14 +36,14 @@ ospd                         --> not changed
 
 ## Current Ebuild Versions
 
-    GVM                          --> 10.0.0 (stable, latest)
+    GVM                          --> 10.0.1 (stable, latest)
 
 ---------------------------------------
 
-    gvm-libs                     --> 10.0.0 (stable, latest)
-    openvas-scanner              -->  6.0.0 (stable, latest)
-    gvmd                         -->  8.0.0 (stable, latest)
-    greenbone-security-assistant -->  8.0.0 (stable, latest)
+    gvm-libs                     --> 10.0.1 (stable, latest)
+    openvas-scanner              -->  6.0.1 (stable, latest)
+    gvmd                         -->  8.0.1 (stable, latest)
+    greenbone-security-assistant -->  8.0.1 (stable, latest)
     gvm-tools                    -->  1.4.1 (stable, latest)
     ospd                         -->  1.3.2 (stable, latest)
 
@@ -109,7 +109,7 @@ Then run:
 
 Then run:
 
-    layman -s gvm-overlay
+    emerge --ask net-analyzer/gvm
 
 ## Use Flags
 
@@ -124,10 +124,3 @@ Then run:
  - postgres   --> Use PostgreSQL for data storage
  - radius     --> Radius Support for Greenbone Vulnerability Management
  - sqlite     --> Use SQLite for data storage
-
-## Scripts
-
-    Inspect the scripts. You never blindly run scripts you
-    downloaded from the Internet, do you?
-    
-https://github.com/hsntgm/gvm-10-scripts

@@ -41,7 +41,11 @@ BDEPEND="
 		  dev-perl/SQL-Translator
 	)"
 
-PATCHES=( "${FILESDIR}/${P}-pid.patch" )
+PATCHES=(
+	# Creating pid on build time instead of relying daemon!
+	# QA fix for 10.0.1.
+	"${FILESDIR}/${P}-pid.patch"
+)
 
 pkg_setup() {
 	enewgroup gvm

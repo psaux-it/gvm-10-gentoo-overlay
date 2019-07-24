@@ -42,9 +42,9 @@ BDEPEND="
 	)"
 
 PATCHES=(
-	# /bin instead of /sbin
+	# Install exec. to /usr/bin instead of /usr/sbin
 	"${FILESDIR}/${P}-sbin.patch"
-	# Fix permisson lock.
+	# Fix permissions for user gvm.
 	"${FILESDIR}/${P}-tmplock.patch"
 )
 

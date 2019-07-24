@@ -59,7 +59,7 @@ PATCHES=(
 	"${FILESDIR}/${P}-uninstall-snippet.patch"
 	# Remove unnecessary install paths/files.
         "${FILESDIR}/${P}-cmakelist.patch"
-	# Install to /usr/bin instead of /usr/sbin
+	# Install exec. to /usr/bin instead of /usr/sbin
         "${FILESDIR}/${P}-sbin.patch"
 )
 

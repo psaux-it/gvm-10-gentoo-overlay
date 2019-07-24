@@ -48,7 +48,10 @@ BDEPEND="
 BUILD_DIR="${WORKDIR}/${MY_PN}-${PV}_build"
 S="${WORKDIR}/${MY_PN}-${PV}"
 
-PATCHES=( "${FILESDIR}/${P}-sbin.patch" )
+PATCHES=(
+	# Install exec. to /usr/bin instead of /usr/sbin
+	"${FILESDIR}/${P}-sbin.patch"
+)
 
 src_prepare() {
 	cmake-utils_src_prepare

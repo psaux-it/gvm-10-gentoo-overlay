@@ -1,13 +1,12 @@
 #!/bin/sh
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# This is GVM (previously named OpenVAS) cron script that updates feed.
-# Hasan ÇALIŞIR | hasan.calisir@psauxit.com | proxy maintaine
+# GVM cron script that updates feed.
 
 # Start to update FEED & First NVT.
 try=0
 until [ $try -ge 5 ]; do
-      greenbone-nvt-sync &>/dev/null && break
+      greenbone-nvt-sync --curl &>/dev/null && break
       try=$[$try+1]
       sleep 30
 done

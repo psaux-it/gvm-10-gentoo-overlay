@@ -76,28 +76,26 @@ Be patient...it will take a while. If you get these errors:
 rsync: failed to connect to feed.openvas.org (89.146.224.58): Connection refused (111)
 rsync: failed to connect to feed.openvas.org (2a01:130:2000:127::d1): Network unreachable (101)
 rsync error: error in socket IO (code 10) at clientserver.c(127) [Receiver=3.1.3]
-then try to append --rsync arg, like:
+then try to append --rsync or --curl arg, like:
 
+greenbone-nvt-sync --curl
 greenbone-scapdata-sync --rsync 
+greenbone-certdata-sync --rsync
+
+Again Be patient...it will take a while to connect greenbone server.
+Try several times to download all feeds before starting daemons.
+* Daemons will not start without feeds.
 
 Now, generate the certificate for gvmd.
 The certificate infrastructure enables OpenVAS daemons to communicate in a secure manner 
 and is used for authentication and authorization before establishing TLS connections between the daemons. 
 
-You can setup the certificate automatically with:
+Setup the certificate automatically with:
 gvm-manage-certs -a
 
-Create a new user with Admin role, and take note of the generated password:
-gvmd --create-user=admin --role=Admin
-
-User created with password '18664575-7101-4ceb-8a94-429a376824e6
-
-Note: if you want to change the password you can run:
-gvmd --user=admin --new-password=MyNewVeryStrongPassword
-
------------------------------------
-3)Starting Greenbone Daemons      |
------------------------------------
+------------------------------------------------------
+3)Starting Greenbone Daemons & Create WEBUI User     |
+------------------------------------------------------
 
 After redis configuration & Greenbone Vulnerability feed sync tasks completed we will start daemons under root.
 
@@ -148,7 +146,18 @@ This will take a while, since 'gvmd' here is rebuilding his database with all NV
 You will see with ```ps aux``` the gvmd process in "Syncing SCAP" state.
 Don't worry, after a while gvmd will load all NVT,scapdate and certdata.This is normal to take long time.
 
-Now start Greenbone Vulnerability Assistant daemon (gsad):
+Create a new user with Admin role, and take note of the generated password under user gvm:
+su gvm
+gvmd --create-user=admin --role=Admin
+
+User created with password '18664575-7101-4ceb-8a94-429a376824e6
+
+Note: if you want to change the password you can run:
+gvmd --user=admin --new-password=MyNewVeryStrongPassword
+
+Now start Greenbone Vulnerability Assistant daemon (gsad) under root:
+
+exit (back to root, we were working under user 'gvm' for creating WebUI user) 
 
 OpenRC
 ------
@@ -208,10 +217,12 @@ gpg --homedir=/etc/openvas/gnupg --import GBCommunitySigningKey.asc
 
 Set Trust:
 To mark a certificate as trusted for your purpose, you have to sign it. 
-The preferred way is to use local signatures that remain only in the keyring of your OpenVAS Scanner installation.
+The preferred way is to use local signatures that remain only 
+in the keyring of your OpenVAS Scanner installation.
 
-KEY_ID=$(printf "%04x%04x" $RANDOM $RANDOM)
+gpg --homedir=/etc/openvas/gnupg --list-keys
 gpg --homedir=/etc/openvas/gnupg --lsign-key $KEY_ID
+e.g. --> gpg --homedir=/etc/openvas/gnupg --lsign-key 0ED1E580
 
 As last step, restart openvas-scanner service:
 

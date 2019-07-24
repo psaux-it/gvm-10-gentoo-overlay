@@ -114,7 +114,7 @@ src_install() {
 		insinto /etc/cron.d
 		newins "${FILESDIR}"/gvm-feed-sync.cron gvm
 
-		# Add user gvm to cron.allow
+		# Add user gvm to cron.allow if exist
 		local CP1 CP2
 		CP1="/etc/cron.d/cron.allow"
 		CP2="/etc/cron.allow"

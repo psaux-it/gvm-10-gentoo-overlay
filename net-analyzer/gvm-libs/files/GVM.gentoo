@@ -95,7 +95,6 @@ User created with password '18664575-7101-4ceb-8a94-429a376824e6
 Note: if you want to change the password you can run:
 gvmd --user=admin --new-password=MyNewVeryStrongPassword
 
-
 -----------------------------------
 3)Starting Greenbone Daemons      |
 -----------------------------------

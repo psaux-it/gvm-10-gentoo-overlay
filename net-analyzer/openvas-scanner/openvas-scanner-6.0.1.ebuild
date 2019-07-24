@@ -109,6 +109,7 @@ src_install() {
 		# Install the cron job if they want it.
 		exeinto /etc/gvm
 		doexe "${FILESDIR}/gvm-feed-sync.sh"
+		fowners gvm:gvm /etc/gvm/gvm-feed-sync.sh
 
 		insinto /etc/cron.d
 		newins "${FILESDIR}"/gvm-feed-sync.cron gvm

@@ -21,5 +21,4 @@ depend() {
 
 start_pre() {
 	/bin/bash /etc/gvm/gvmd-startpre.sh
-	checkpath --directory --mode 0775 --quiet /var/cache/openvas
 }

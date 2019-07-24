@@ -16,5 +16,5 @@ retry="${GSAD_TIMEOUT}"
 
 depend() {
 	after bootmisc
-	need localmount net openvas-scanner gvmd
+	need localmount net gvmd
 }

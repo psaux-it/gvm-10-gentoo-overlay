@@ -7,6 +7,7 @@ CMAKE_MAKEFILE_GENERATOR="emake"
 inherit cmake-utils flag-o-matic systemd toolchain-funcs
 
 MY_PN="openvas"
+MY_DN="openvassd"
 
 DESCRIPTION="Open Vulnerability Assessment Scanner"
 HOMEPAGE="https://www.greenbone.net/en/"
@@ -99,11 +100,11 @@ src_install() {
 
 	dodir /etc/openvas
 	insinto /etc/openvas
-	doins "${FILESDIR}"/openvassd.conf "${FILESDIR}"/redis.conf.example
+	doins "${FILESDIR}/${MY_DN}.conf" "${FILESDIR}"/redis.conf.example
 
 	dodir /etc/openvas/sysconfig
 	insinto /etc/openvas/sysconfig
-	doins "${FILESDIR}/${PN}-daemon.conf"
+	doins "${FILESDIR}/${MY_DN}-daemon.conf"
 
 	if use cron; then
 		# Install the cron job if they want it.
@@ -120,25 +121,25 @@ src_install() {
 		CP2="/etc/cron.allow"
 		dodir /etc/cron.d
 		if [[ -s "${CP1}" ]]; then
-			cp "${CP1}" "${D}/${CP1}" || die "cron install failed"
-			sed -i -e '1 i\gvm' "${D}/${CP1}" || die "cron install failed"
+			cp "${CP1}" "${D}/${CP1}" || die
+			sed -i -e '1 i\gvm' "${D}/${CP1}" || die
 		fi
 		if [[ -s "${CP2}" ]]; then
-			cp "${CP2}" "${D}/${CP2}" || die "cron install failed"
-			sed -i -e '1 i\gvm' "${D}/${CP2}" || die "cron install failed"
+			cp "${CP2}" "${D}/${CP2}" || die
+			sed -i -e '1 i\gvm' "${D}/${CP2}" || die
 		fi
 	fi
 
 	fowners -R gvm:gvm /etc/openvas
 
-	newinitd "${FILESDIR}/${PN}.init" "${PN}"
-	newconfd "${FILESDIR}/${PN}-daemon.conf" "${PN}"
+	newinitd "${FILESDIR}/${MY_DN}.init" "${MY_DN}"
+	newconfd "${FILESDIR}/${MY_DN}-daemon.conf" "${MY_DN}"
 
 	dodir /etc/logrotate.d
 	insinto /etc/logrotate.d
-	newins "${FILESDIR}/${PN}.logrotate" "${PN}"
+	newins "${FILESDIR}/${MY_DN}.logrotate" "${MY_DN}"
 
-	systemd_dounit "${FILESDIR}/${PN}.service"
+	systemd_dounit "${FILESDIR}/${MY_DN}.service"
 
 	# Set proper permissions on required files/directories
 	keepdir /var/log/gvm

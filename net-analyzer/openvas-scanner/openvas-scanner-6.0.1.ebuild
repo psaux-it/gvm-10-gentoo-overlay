@@ -100,7 +100,10 @@ src_install() {
 
 	dodir /etc/openvas
 	insinto /etc/openvas
-	doins "${FILESDIR}/${MY_DN}.conf" "${FILESDIR}"/redis.conf.example
+	newins "${FILESDIR}/${MY_DN}.conf.gvm" openvassd.conf
+
+	insinto /etc/openvas
+	doins "${FILESDIR}"/redis.conf.example
 
 	dodir /etc/openvas/sysconfig
 	insinto /etc/openvas/sysconfig

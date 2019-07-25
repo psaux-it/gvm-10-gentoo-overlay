@@ -124,12 +124,16 @@ src_install() {
 		CP2="/etc/cron.allow"
 		dodir /etc/cron.d
 		if [[ -s "${CP1}" ]]; then
+		   if grep -v "gvm" "${CP1}"; then
 			cp "${CP1}" "${D}/${CP1}" || die
 			sed -i -e '1 i\gvm' "${D}/${CP1}" || die
+		   fi
 		fi
 		if [[ -s "${CP2}" ]]; then
+		   if grep -v "gvm" "${CP2}"; then
 			cp "${CP2}" "${D}/${CP2}" || die
 			sed -i -e '1 i\gvm' "${D}/${CP2}" || die
+		   fi
 		fi
 	fi
 

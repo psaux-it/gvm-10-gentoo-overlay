@@ -97,31 +97,27 @@ gvm-manage-certs -a
 3)Starting Greenbone Daemons & Create WEBUI User     |
 ------------------------------------------------------
 
-After redis configuration & Greenbone Vulnerability feed sync tasks completed we will start daemons under root.
+After redis configuration & Greenbone Vulnerability feed rsync tasks completed we will start daemons under root.
 
 Note:
 -----
-* Start services sequentially | openvas-scanner > gvmd > gsad , 
+* Start services sequentially | openvassd > gvmd > gsad , 
 * Greenbone daemons ignores SIGHUP. So restart & reload commands not work as expected,
 * Work under root.
 
-Generate the openvas scanner cache and start daemon:
+Start openvas scanner daemon:
 
 exit (back to root,we were working under user 'gvm')
 
 OpenRC
 ------
-rc-service openvassd stop
-rc-service openvassd create_cache
 rc-service openvassd start
 rc-update add openvassd
 
 Systemd
 -------
-systemctl stop openvas-scanner.service
-openvassd --foreground --only-cache
-systemctl start openvas-scanner.service
-systemctl enable openvas-scanner.service
+systemctl start openvassd.service
+systemctl enable openvassd.service
 
 This will take a while, since OpenVAS here is loading all NVT definition downloaded. 
 Check the status of openvassd that completed loading NVTs before starting gvmd:
@@ -144,7 +140,7 @@ systemctl enable gvmd.service
 
 This will take a while, since 'gvmd' here is rebuilding his database with all NVT definition downloaded. 
 You will see with ```ps aux``` the gvmd process in "Syncing SCAP" state.
-Don't worry, after a while gvmd will load all NVT,scapdate and certdata.This is normal to take long time.
+Don't worry, after a while gvmd will load scapdata.This is normal to take long time.
 
 Create a new user with Admin role, and take note of the generated password under user gvm:
 su gvm
@@ -224,24 +220,31 @@ gpg --homedir=/etc/openvas/gnupg --list-keys
 gpg --homedir=/etc/openvas/gnupg --lsign-key $KEY_ID
 e.g. --> gpg --homedir=/etc/openvas/gnupg --lsign-key 0ED1E580
 
+Before signing you should be absolutely sure that you are signing the correct certificate. 
+You may use its fingerprint and other methods to convince yourself.
+
+To enable NVT signing on openvassd:
+
+sed -i -e "s/nasl_no_signature_check.*/nasl_no_signature_check = no/g" /etc/openvas/openvassd.conf
+
 As last step, restart openvas-scanner service:
 
 OpenRC
 ------
-rc-service openvas-scanner stop
-rc-service openvas-scanner start
+rc-service openvassd stop
+rc-service openvassd start
 
 Systemd
 -------
 
-systemctl stop openvas-scanner
-systemctl start openvas-scanner
+systemctl stop openvassd.service
+systemctl start openvassd.service
 
 ---------------------------
 Systemd & OpenRC Settings |
 ---------------------------
 
-'openvas-scanner-daemon.conf'  
+'openvassd-daemon.conf'  
 --> OpenVAS Scanner systemd daemon settings
 --> Installed in /etc/openvas/sysconfig
 
@@ -255,7 +258,7 @@ Systemd & OpenRC Settings |
 
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-'openvas-scanner'
+'openvassd'
 --> OpenVAS Scanner open-rc daemon settings
 --> Installed in /etc/conf.d
 
@@ -273,6 +276,7 @@ Cron |
 
 If you used 'cron' use flag cron job installed in /etc/cron.d
 The cron script installed in /etc/gvm/gvm-feed-sync.sh
+Cron will run under user 'gvm'.
 
 --------------------
 POSTGRESQL BACKEND |

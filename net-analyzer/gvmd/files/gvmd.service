@@ -1,8 +1,8 @@
 [Unit]
 Description=Greenbone Vulnerability Manager
 After=network.target
-After=openvas-scanner.service
-Wants=openvas-scanner.service
+After=openvassd.service
+Wants=openvassd.service
 Before=gsad.service
 
 [Service]

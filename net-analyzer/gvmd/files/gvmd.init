@@ -16,7 +16,7 @@ retry="${GVMD_TIMEOUT}"
 
 depend() {
 	after bootmisc
-	need localmount net openvas-scanner
+	need localmount net openvassd
 }
 
 start_pre() {

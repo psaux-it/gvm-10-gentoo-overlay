@@ -1,7 +1,7 @@
 [Unit]
 Description=Greenbone Security Assistant
 After=network.target
-After=openvas-scanner.service
+After=openvassd.service
 After=gvmd.service
 Wants=gvmd.service
 

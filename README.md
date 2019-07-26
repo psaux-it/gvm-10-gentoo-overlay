@@ -7,6 +7,14 @@ https://packages.gentoo.org/packages/net-analyzer/openvas
 
 The new GVM-10 package hasn't been merged to main gentoo tree yet so you can use this overlay to use new GVM-10 version.
 
+## What is GVM (previously named OpenVAS)
+
+GVM is a full-featured vulnerability scanner. Its capabilities include unauthenticated testing, authenticated testing, various high level and low level Internet and industrial protocols, performance tuning for large-scale scans and a powerful internal programming language to implement any type of vulnerability test.
+
+    GVM Community Edition        --> https://github.com/greenbone
+    OpenVAS HomePage (OLD)       --> http://www.openvas.org/
+    Greenbone HomePage           --> https://www.greenbone.net/en/
+
 # Important Note:
 
 If you confused about GVM and OpenVAS keep reading.
@@ -76,14 +84,6 @@ Huge improvement in WEBUI (greenbone-security-assistant), lots of bug fixing in 
 If you have used Manager before, you might need to migrate the database to the current data model. Use this command to run the migration:
 
     gvmd --migrate
-
-## What is GVM (previously named OpenVAS)
-
-GVM is a full-featured vulnerability scanner. Its capabilities include unauthenticated testing, authenticated testing, various high level and low level Internet and industrial protocols, performance tuning for large-scale scans and a powerful internal programming language to implement any type of vulnerability test.
-
-    GVM Community Edition        --> https://github.com/greenbone
-    OpenVAS HomePage (OLD)       --> http://www.openvas.org/
-    Greenbone HomePage           --> https://www.greenbone.net/en/
 
 ## Usage
 

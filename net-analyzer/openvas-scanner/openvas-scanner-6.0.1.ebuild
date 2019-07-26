@@ -117,24 +117,6 @@ src_install() {
 
 		insinto /etc/cron.d
 		newins "${FILESDIR}"/gvm-feed-sync.cron gvm
-
-		# Add user gvm to cron.allow if exist
-		local CP1 CP2
-		CP1="/etc/cron.d/cron.allow"
-		CP2="/etc/cron.allow"
-		dodir /etc/cron.d
-		if [[ -s "${CP1}" ]]; then
-		   if grep -v "gvm" "${CP1}"; then
-			cp "${CP1}" "${D}/${CP1}" || die
-			sed -i -e '1 i\gvm' "${D}/${CP1}" || die
-		   fi
-		fi
-		if [[ -s "${CP2}" ]]; then
-		   if grep -v "gvm" "${CP2}"; then
-			cp "${CP2}" "${D}/${CP2}" || die
-			sed -i -e '1 i\gvm' "${D}/${CP2}" || die
-		   fi
-		fi
 	fi
 
 	fowners -R gvm:gvm /etc/openvas

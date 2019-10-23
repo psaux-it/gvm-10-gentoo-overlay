@@ -48,8 +48,8 @@ PATCHES=(
 )
 
 pkg_setup() {
-	enewgroup gvm
-	enewuser gvm -1 /bin/bash /var/lib/gvm gvm
+	enewgroup gvm 495
+	enewuser gvm 495 -1 /var/lib/gvm gvm
 }
 
 src_prepare() {
@@ -95,9 +95,6 @@ src_compile() {
 
 src_install() {
 	cmake-utils_src_install
-
-	insinto /usr/share/gvm
-	doins "${FILESDIR}"/GVM.gentoo
 
 	# Set proper permissions on required files/directories
 	keepdir /var/lib/gvm

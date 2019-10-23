@@ -15,7 +15,7 @@ HOMEPAGE="https://www.greenbone.net/en/"
 SRC_URI="https://github.com/greenbone/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	 https://github.com/greenbone/gsa/releases/download/v8.0.1/gsa-node-modules-8.0.1.tar.gz -> ${P}-${MY_NODE_N}.tar.gz"
 
-SLOT="1"
+SLOT="0"
 LICENSE="GPL-2+"
 KEYWORDS="~amd64 ~x86"
 IUSE="extras"
@@ -29,13 +29,13 @@ DEPEND="
 
 RDEPEND="
 	${DEPEND}
-	!net-analyzer/greenbone-security-assistant:0
-	>=net-analyzer/openvas-scanner-6.0.1:1
+	!~net-analyzer/greenbone-security-assistant-7.0.3
+	~net-analyzer/openvas-scanner-6.0.1
 	>=net-analyzer/gvmd-8.0.1"
 
 BDEPEND="
 	>=net-libs/nodejs-8.12.0
-        >=sys-apps/yarn-1.15.2
+	>=sys-apps/yarn-1.15.2
 	virtual/pkgconfig
 	extras? ( app-doc/doxygen[dot]
 		  app-doc/xmltoman
@@ -58,9 +58,9 @@ PATCHES=(
 	# Remove ugly uninstall-snippet that causes failing re-emerge.
 	"${FILESDIR}/${P}-uninstall-snippet.patch"
 	# Remove unnecessary install paths/files.
-        "${FILESDIR}/${P}-cmakelist.patch"
+	"${FILESDIR}/${P}-cmakelist.patch"
 	# Install exec. to /usr/bin instead of /usr/sbin
-        "${FILESDIR}/${P}-sbin.patch"
+	"${FILESDIR}/${P}-sbin.patch"
 )
 
 src_prepare() {
@@ -114,7 +114,7 @@ src_install() {
 
 	dodir /etc/gvm/reverse-proxy
 	insinto /etc/gvm/reverse-proxy
-	doins "${FILESDIR}/${MY_DN}.nginx.reverse.proxy.example"
+	doins "${FILESDIR}/${MY_PN}.nginx.reverse.proxy.example"
 	fowners -R gvm:gvm /etc/gvm
 
 	newinitd "${FILESDIR}/${MY_DN}.init" "${MY_DN}"

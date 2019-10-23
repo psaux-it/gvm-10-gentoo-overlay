@@ -11,22 +11,19 @@ HOMEPAGE="https://www.greenbone.net/en/"
 SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="~amd64 ~x86"
-IUSE="cli +cron +extras +gsa ldap +ospd postgres radius +sqlite"
+IUSE="cli +cron +extras +gsa ldap ospd postgres radius +sqlite"
 REQUIRED_USE="|| ( postgres sqlite )"
 
 RDEPEND="
 	>=net-analyzer/gvm-libs-10.0.1[extras?,ldap?,radius?]
 	>=net-analyzer/gvmd-8.0.1[extras?,postgres?,sqlite?]
-	>=net-analyzer/openvas-scanner-6.0.1:1[cron?,extras?]
+	~net-analyzer/openvas-scanner-6.0.1[cron?,extras?]
 	!net-analyzer/openvas
 	cli? ( >=net-analyzer/gvm-tools-1.4.1 )
-	gsa? ( >=net-analyzer/greenbone-security-assistant-8.0.1:1[extras?] )
+	gsa? ( ~net-analyzer/greenbone-security-assistant-8.0.1[extras?] )
 	ospd? ( >=net-analyzer/ospd-1.3.2[extras?] )"
 
 pkg_postinst() {
-	elog "----------------------------IMPORTANT----------------------------"
-	elog " You can find detailed instruction > /usr/share/gvm/GVM.gentoo   "
-	elog "-----------------------------------------------------------------"
 	elog "Additional support for extra checks can be get from"
 	optfeature "Web server scanning and testing tool" net-analyzer/nikto
 	optfeature "Portscanner" net-analyzer/nmap

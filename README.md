@@ -1,11 +1,6 @@
 # GVM 10.0.0 (Greenbone Vulnerability Management) for Gentoo/Linux (Previously named OpenVAS)
 
-This is not official Gentoo/Linux GVM package.
-
-You can find -OLD- official Gentoo/Linux OpenVAS package: 
-https://packages.gentoo.org/packages/net-analyzer/openvas
-
-The new GVM-10 package hasn't been merged to main gentoo tree yet so you can use this overlay to use new GVM-10 version.
+GVM‑10 with all components is now fully merged into the main Gentoo repository (maintaining by me). Gentoo users can install it directly with emerge — the overlay is no longer needed and considered stale.
 
 ## What is GVM (previously named OpenVAS)
 
